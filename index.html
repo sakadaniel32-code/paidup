@@ -417,6 +417,7 @@ function paperHTML(d,s,c){
   ${d.items.map(i=>`<tr><td><b>${esc(i.desc)}</b>${i.details?`<div class="det">${esc(i.details)}</div>`:''}</td><td class="r">${i.qty}</td><td class="r">${money(i.rate,d.cur)}</td><td class="r">${money(i.qty*i.rate,d.cur)}</td></tr>`).join('')}
   </tbody></table>
   <div class="tot"><div><p><span>Subtotal</span><span>${money(total(d),d.cur)}</span></p>${paid(d)?`<p><span>Paid</span><span>− ${money(paid(d),d.cur)}</span></p>`:''}<p class="grand"><span>${d.type==='invoice'&&paid(d)?'Balance':'Total'}</span><span>${money(d.type==='invoice'&&paid(d)?balance(d):total(d),d.cur)}</span></p></div></div>
+  ${d.type==='invoice'&&state(d)!=='paid'&&(s.acctNo||s.payLink)?`<div style="text-align:right;margin-top:14px"><a href="${viewLink(d)}?pay=1" style="display:inline-block;background:#111;color:#fff;padding:10px 18px;border-radius:999px;font-weight:600;font-size:12px;text-decoration:none">Pay now →</a></div>`:''}
   <div class="words">${numWords(total(d))} ${curWord[d.cur||s.currency]||''} only</div>
   <div class="foot"><div>${s.acctNo?`<div class="lab2">Pay by bank transfer</div>${esc(s.acctName)}\n${esc(s.acctNo)}\n${esc(s.bank)}`:''}</div><div>${(d.notes||s.terms)?`<div class="lab2">Notes and terms</div>${esc(d.notes||s.terms)}`:''}</div></div>
   </div>`;
@@ -515,6 +516,8 @@ function settings(){
   <div class="card"><div class="ch"><h3>How you get paid</h3></div>
    <label style="margin-top:0">Currency</label><select data-s="currency">${cur.map(x=>`<option ${x===S.currency?'selected':''}>${x}</option>`).join('')}</select>
    <label>Account name</label><input data-s="acctName" value="${esc(S.acctName)}"><div class="grid2"><div><label>Account number</label><input data-s="acctNo" value="${esc(S.acctNo)}"></div><div><label>Bank</label><input data-s="bank" value="${esc(S.bank)}"></div></div>
+   <label>Payment link for foreign clients (optional)</label><input data-s="payLink" value="${esc(S.payLink||'')}" placeholder="Paystack, Flutterwave, PayPal or Stripe link">
+   <div class="small muted" style="margin-top:6px">Naira invoices copy your account number for the client. Invoices in other currencies open this link instead.</div>
    <div class="grid2"><div><label>Invoices due after (days)</label><input type="number" data-s="dueDays" value="${S.dueDays}"></div><div><label>Quotes valid for (days)</label><input type="number" data-s="validDays" value="${S.validDays}"></div></div>
    <label>Default terms</label><textarea data-s="terms">${esc(S.terms)}</textarea></div>
   <div class="card"><div class="ch"><h3>Reminder tone</h3></div><div class="seg">${[['polite','Polite'],['firm','Firm'],['abeg','Abeg o']].map(([k,l])=>`<button data-tone="${k}" class="${S.tone===k?'on':''}">${l}</button>`).join('')}</div>
@@ -537,7 +540,8 @@ settings._bind=()=>{
 
 /* ---------- CLIENT VIEW ---------- */
 function view(){return `<div class="empty" style="margin-top:80px">Opening…</div>`}
-view._bind=async token=>{
+view._bind=async(token,q)=>{
+  const autoPay=q&&q.get('pay')==='1';
   let d,s,c,owner=D.some(x=>x.share_token===token||x.id===token);
   if(MODE==='demo'){d=D.find(x=>x.share_token===token||x.id===token);s=S;c=d&&client(d.clientId)}
   else if(sb){try{const r=await sb.rpc('get_shared_doc',{token});if(r.data){d=r.data.doc;s=Object.assign(defaultSettings(),r.data.biz||{});c=r.data.client||{name:''}}}catch(e){}}
@@ -550,14 +554,27 @@ view._bind=async token=>{
    $('#app').innerHTML=`<div class="view-wrap"><div class="noprint" style="text-align:center;margin:6px 0 16px"><div class="logo" style="font-size:18px">${esc(s.biz)}</div><div class="muted small">sent you a ${d.type==='quote'?'quote':'invoice'}</div></div>
    ${paperHTML(d,s,c)}
    <div class="client-bar noprint">${d.type==='quote'&&!['accepted','declined'].includes(d.status)?`<button class="btn pri" id="vacc">Accept quote</button>`:''}${d.type==='quote'&&d.status==='accepted'?'<span class="badge b-accepted" style="padding:9px 14px">✓ You accepted this quote</span>':''}
-   ${d.type==='invoice'&&st!=='paid'&&s.acctNo?`<button class="btn pri" id="vpay">Pay ${money(balance(d),d.cur)}</button>`:''}${st==='paid'?'<span class="badge b-paid" style="padding:9px 14px">✓ Paid. Thank you!</span>':''}<button class="btn" onclick="window.print()">Download PDF</button></div>
+   ${d.type==='invoice'&&st!=='paid'&&(s.acctNo||s.payLink)?`<button class="btn pri" id="vpay" style="padding:15px 26px;font-size:15px">Pay now · ${money(balance(d),d.cur)}</button>`:''}${st==='paid'?'<span class="badge b-paid" style="padding:9px 14px">✓ Paid. Thank you!</span>':''}<button class="btn" onclick="window.print()">Download PDF</button></div>
    ${owner?'<div class="noprint small muted" style="text-align:center">This is what your client sees.</div>':''}
    <div class="noprint muted small" style="text-align:center;margin-top:24px">Made with <b style="color:#111">Paidup</b></div></div>`;
    const a=$('#vacc');a&&(a.onclick=async()=>{a.disabled=true;try{await fire('accepted');d.status='accepted';paint();toast('Quote accepted. '+s.biz+' can see it now.')}catch(e){a.disabled=false;toast("That didn't go through. Try again.")}});
-   const p=$('#vpay');p&&(p.onclick=()=>sheet(`<div class="top" style="margin-bottom:8px"><span style="width:38px"></span><div class="ttl">Pay by bank transfer</div><button class="icb" id="vx">✕</button></div>
-    <div class="keyamt" style="padding:16px 0">${money(balance(d),d.cur)}</div><div class="muted small" style="text-align:center;margin:-8px 0 14px">Use ${esc(d.num)} as your reference</div>
+   const p=$('#vpay');
+   const details=copied=>sheet(`<div class="top" style="margin-bottom:8px"><span style="width:38px"></span><div class="ttl">Pay by transfer</div><button class="icb" id="vx">✕</button></div>
+    ${copied?`<div class="card" style="display:flex;gap:10px;align-items:center;background:var(--lime)"><div style="font-size:20px">✓</div><div class="small"><b>Account number copied.</b> Open your bank app and paste it.</div></div>`:''}
+    <div class="keyamt" style="padding:12px 0">${money(balance(d),d.cur)}</div><div class="muted small" style="text-align:center;margin:-6px 0 14px">Use ${esc(d.num)} as your reference</div>
     <div class="card"><div class="small muted">Account name</div><div style="font-weight:600;margin-bottom:10px">${esc(s.acctName)}</div><div class="small muted">Account number</div><div style="font-weight:700;font-size:22px;letter-spacing:1px;margin-bottom:10px">${esc(s.acctNo)}</div><div class="small muted">Bank</div><div style="font-weight:600">${esc(s.bank)}</div></div>
-    <div class="agrid"><button class="btn" id="cpy">Copy number</button><button class="btn pri" id="done">I've sent it</button></div>`,(m,close)=>{m.querySelector('#vx').onclick=close;m.querySelector('#cpy').onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(s.acctNo);toast('Copied')};m.querySelector('#done').onclick=async()=>{try{await fire('client_paid')}catch(e){}close();toast('Thanks! '+s.biz+' will confirm shortly.')}}));
+    <div class="agrid"><button class="btn" id="cpy">Copy number</button><button class="btn pri" id="done">I've paid</button></div>`,(m,close)=>{m.querySelector('#vx').onclick=close;m.querySelector('#cpy').onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(s.acctNo).catch(()=>{});toast('Copied')};m.querySelector('#done').onclick=async()=>{try{await fire('client_paid')}catch(e){}close();toast('Thanks! '+s.biz+' will confirm shortly.')}});
+   p&&(p.onclick=()=>{
+     const naira=(d.cur||s.currency)==='NGN';
+     if(!naira&&s.payLink){window.open(s.payLink,'_blank');return}
+     if(!s.acctNo){toast('No bank details on this invoice yet');return}
+     let copied=false;
+     if(navigator.clipboard){navigator.clipboard.writeText(s.acctNo).then(()=>{}).catch(()=>{});copied=true}
+     if(naira&&navigator.share){
+       navigator.share({title:'Payment details',text:`${s.acctNo}\n${s.bank} · ${s.acctName}\nAmount: ${money(balance(d),d.cur)}\nRef: ${d.num}`}).catch(()=>{}).finally(()=>details(copied));
+     }else details(copied);
+   });
+   if(autoPay&&p){p.scrollIntoView({block:'center'});p.animate([{transform:'scale(1)'},{transform:'scale(1.06)'},{transform:'scale(1)'}],{duration:600,iterations:2})}
   };
   paint();
 };
