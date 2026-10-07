@@ -10,7 +10,7 @@
 <style>
 :root{--bg:#ECECEC;--card:#FFFFFF;--soft:#F3F3F3;--line:#E7E7E7;--text:#111111;--muted:#8B8B8B;--lime:#C9F230;--ink:#111111;--ok:#22A55B;--bad:#E5484D;--warn:#C98A06}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{background:linear-gradient(180deg,#F6F6F6 0%,#E8E8E8 100%) fixed;color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+html{background:#E9E9E9}body{min-height:100vh;background:linear-gradient(180deg,#F6F6F6 0%,#E9E9E9 600px);}html,body{color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
 a{color:inherit;text-decoration:none}
 button,input,select,textarea{font:inherit;color:inherit}
 #app{max-width:440px;margin:0 auto;padding:18px 16px 120px}
@@ -291,7 +291,7 @@ function home(){
   drafts.forEach(d=>act.push(row(d,'Draft, not sent yet',`<button class="btn sm" data-open="${d.id}">Finish</button>`)));
   const recent=[...D].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,5);
   const lateAmt=late.reduce((a,d)=>a+balance(d),0);
-  const promo=late.length?`<div class="promo" data-open="${late[0].id}"><div class="grow"><b>${late.length} client${late.length>1?'s are':' is'} late</b><p>${money(lateAmt)} is overdue. Send a friendly reminder on WhatsApp in one tap.</p></div><div class="coin">!</div></div>`
+  const promo=late.length?`<div class="promo" data-open="${late[0].id}"><div class="grow"><b>${late.length} client${late.length>1?'s are':' is'} late</b><p>${money(lateAmt)} is overdue. Send a friendly reminder on WhatsApp in one tap.</p></div><div class="coin">${({NGN:'₦',USD:'$',GBP:'£',EUR:'€'})[S.currency]||'₦'}</div></div>`
    :`<a class="promo" href="#/new"><div class="grow"><b>Type it, send it, get paid</b><p>Try "bill Kemi's Kitchen ₦160k for 20 designs" and the invoice writes itself.</p></div><div class="coin">${({NGN:'₦',USD:'$',GBP:'£',EUR:'€'})[S.currency]||'₦'}</div></a>`;
   const recentClients=[...C].sort((a,b)=>{const la=Math.max(0,...D.filter(d=>d.clientId===a.id).map(d=>+new Date(d.date)));const lb=Math.max(0,...D.filter(d=>d.clientId===b.id).map(d=>+new Date(d.date)));return lb-la}).slice(0,8);
   return `<div class="top"><div class="logo">Paidup</div><div class="tr"><button class="icb" id="how">${ic.help}</button><a class="blackpill" href="#/new">${ic.plus.replace('<svg','<svg width="14" height="14"')} New<span class="ld"></span></a></div></div>
