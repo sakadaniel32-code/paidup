@@ -113,12 +113,12 @@ nav.bar svg{width:20px;height:20px}
 <script>
 /* ---------- storage ---------- */
 const K='paidup_';
-const load=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(K+k));return v??d}catch(e){return d}};
+const load=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(K+k));return (v===null||v===undefined)?d:v}catch(e){return d}};
 const save=()=>{localStorage.setItem(K+'settings',JSON.stringify(S));localStorage.setItem(K+'clients',JSON.stringify(C));localStorage.setItem(K+'docs',JSON.stringify(D))};
 const uid=()=>Math.random().toString(36).slice(2,9);
 const today=()=>new Date().toISOString().slice(0,10);
 const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x.toISOString().slice(0,10)};
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 let S=load('settings',null),C=load('clients',null),D=load('docs',null);
 if(!S){S={biz:'Your Studio',email:'',phone:'',logo:'',color:'#F05E1C',currency:'NGN',acctName:'',acctNo:'',bank:'',terms:'50% upfront, balance on delivery.\nPayment due within 7 days of invoice.',tone:'polite',dueDays:7,validDays:14}}
@@ -243,7 +243,7 @@ function home(){
 }
 home._bind=()=>bindRows();
 function row(d,sub,right){const c=client(d.clientId),st=state(d);
- return `<div class="row" data-open="${d.id}"><div class="av">${esc(c.name[0]||'?')}</div><div class="grow"><div class="t">${esc(c.name)} · <span class="muted" style="font-weight:500">${esc(d.num)}</span></div><div class="small muted">${sub||esc(d.title||d.items[0]?.desc||'')}</div></div><div class="amt">${money(st==='part'?balance(d):total(d),d.cur)}<div>${badge(st)}</div></div>${right?`<div>${right}</div>`:''}</div>`}
+ return `<div class="row" data-open="${d.id}"><div class="av">${esc(c.name[0]||'?')}</div><div class="grow"><div class="t">${esc(c.name)} · <span class="muted" style="font-weight:500">${esc(d.num)}</span></div><div class="small muted">${sub||esc(d.title||(d.items[0]||{}).desc||'')}</div></div><div class="amt">${money(st==='part'?balance(d):total(d),d.cur)}<div>${badge(st)}</div></div>${right?`<div>${right}</div>`:''}</div>`}
 function bindRows(){
  document.querySelectorAll('[data-open]').forEach(e=>e.onclick=ev=>{if(ev.target.closest('a,button')&&ev.target.closest('a,button')!==e)return;go('/doc/'+e.dataset.open)});
  document.querySelectorAll('[data-convert]').forEach(e=>e.onclick=ev=>{ev.stopPropagation();convert(e.dataset.convert)});
@@ -334,7 +334,7 @@ doc._bind=id=>{
    if(a==='sent'){d.status='sent';d.tl.push({s:'sent',at:today()});save();render()}
    if(a==='convert')convert(d.id);
    if(a==='pay')payment(d);
-   if(a==='copy'){navigator.clipboard?.writeText(viewLink(d));toast('Link copied')}
+   if(a==='copy'){navigator.clipboard&&navigator.clipboard.writeText(viewLink(d));toast('Link copied')}
    if(a==='print')window.print();
    if(a==='dup'){const n=JSON.parse(JSON.stringify(d));n.id=uid();n.num=nextNum(d.type);n.status='draft';n.payments=[];n.date=today();n.due=addDays(today(),d.type==='quote'?S.validDays:S.dueDays);n.tl=[{s:'created',at:today()}];delete n.fromQuote;D.push(n);save();go('/doc/'+n.id)}
    if(a==='del'){if(confirm('Delete '+d.num+'? This cannot be undone.')){D=D.filter(x=>x.id!==d.id);save();go('/home')}}
@@ -413,7 +413,7 @@ view._bind=id=>{const d=D.find(x=>x.id===id);if(!d)return;
   const a=$('#vacc');a&&(a.onclick=()=>{d.status='accepted';d.tl.push({s:'accepted by client',at:today()});save();render();toast('Quote accepted. '+S.biz+' has been notified.')});
   const p=$('#vpay');p&&(p.onclick=()=>sheet(`<div class="display" style="font-size:30px">Pay by bank transfer</div><div class="muted small">Send exactly ${money(balance(d),d.cur)} and use ${esc(d.num)} as the reference.</div>
    <div class="card" style="margin-top:14px"><label style="margin-top:0">Account name</label><div style="font-weight:700">${esc(S.acctName)}</div><label>Account number</label><div style="font-weight:700;font-size:22px;letter-spacing:1px">${esc(S.acctNo)}</div><label>Bank</label><div style="font-weight:700">${esc(S.bank)}</div></div>
-   <div class="actions"><button class="btn" id="cpy">Copy account number</button><button class="btn pri" id="done">I've sent it</button></div>`,(m,close)=>{m.querySelector('#cpy').onclick=()=>{navigator.clipboard?.writeText(S.acctNo);toast('Copied')};m.querySelector('#done').onclick=()=>{d.tl.push({s:'client says paid',at:today()});save();close();toast('Thanks! '+S.biz+' will confirm shortly.')}}));
+   <div class="actions"><button class="btn" id="cpy">Copy account number</button><button class="btn pri" id="done">I've sent it</button></div>`,(m,close)=>{m.querySelector('#cpy').onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(S.acctNo);toast('Copied')};m.querySelector('#done').onclick=()=>{d.tl.push({s:'client says paid',at:today()});save();close();toast('Thanks! '+S.biz+' will confirm shortly.')}}));
 };
 
 const $=s=>document.querySelector(s);
