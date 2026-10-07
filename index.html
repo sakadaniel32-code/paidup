@@ -152,21 +152,52 @@ nav.bar svg{width:20px;height:20px}
 <div id="app"></div>
 <nav class="bar noprint" id="nav"></nav>
 <div class="toast" id="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ---------- storage ---------- */
+const SB_URL='https://rsmecdjskwhrqpobivvg.supabase.co',SB_KEY='sb_publishable_FCa5SnOusl-t3-mwai4PZw_9M32lAli';
+const sb=window.supabase?window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,detectSessionInUrl:true,flowType:'implicit'}}):null;
 const K='paidup_';
-const load=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(K+k));return (v===null||v===undefined)?d:v}catch(e){return d}};
-const save=()=>{localStorage.setItem(K+'settings',JSON.stringify(S));localStorage.setItem(K+'clients',JSON.stringify(C));localStorage.setItem(K+'docs',JSON.stringify(D))};
+const lsGet=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(K+k));return (v===null||v===undefined)?d:v}catch(e){return d}};
 const uid=()=>Math.random().toString(36).slice(2,9);
+const newToken=()=>(window.crypto&&crypto.randomUUID)?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==='x'?r:(r&3|8)).toString(16)});
 const today=()=>new Date().toISOString().slice(0,10);
 const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x.toISOString().slice(0,10)};
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const $=s=>document.querySelector(s);
-
-let S=load('settings',null),C=load('clients',null),D=load('docs',null);
-if(!S){S={biz:'Your Studio',email:'',phone:'',logo:'',color:'#111111',currency:'NGN',acctName:'',acctNo:'',bank:'',terms:'50% upfront, balance on delivery.\nPayment due within 7 days of invoice.',tone:'polite',dueDays:7,validDays:14}}
-if(S.color==='#F05E1C')S.color='#111111';
-if(!C||!D)seed();
+const defaultSettings=()=>({biz:'Your Studio',email:'',phone:'',logo:'',color:'#111111',currency:'NGN',acctName:'',acctNo:'',bank:'',terms:'50% upfront, balance on delivery.\nPayment due within 7 days of invoice.',tone:'polite',dueDays:7,validDays:14});
+let MODE=null,USER=null,S=defaultSettings(),C=[],D=[];
+const deleted={clients:new Set(),docs:new Set()};
+function loadDemo(){S=Object.assign(defaultSettings(),lsGet('settings',{}));if(S.color==='#F05E1C')S.color='#111111';C=lsGet('clients',null);D=lsGet('docs',null);if(!C||!D)seed();D.forEach(d=>{if(!d.share_token)d.share_token=newToken()})}
+async function loadCloud(){
+  const[s1,c1,d1]=await Promise.all([sb.from('settings').select('data').maybeSingle(),sb.from('clients').select('*'),sb.from('docs').select('*')]);
+  const e=s1.error||c1.error||d1.error;if(e)throw e;
+  S=Object.assign(defaultSettings(),s1.data?s1.data.data:{});if(!s1.data&&USER.email)S.email=USER.email;
+  C=c1.data.map(r=>({id:r.id,name:r.name,phone:r.phone||'',email:r.email||'',notes:r.notes||''}));
+  D=d1.data.map(r=>Object.assign({},r.data,{id:r.id,share_token:r.share_token}));
+}
+let syncT=null,syncing=false;
+function save(){
+  if(MODE==='demo'){localStorage.setItem(K+'settings',JSON.stringify(S));localStorage.setItem(K+'clients',JSON.stringify(C));localStorage.setItem(K+'docs',JSON.stringify(D));return}
+  if(MODE!=='cloud')return;
+  clearTimeout(syncT);syncT=setTimeout(sync,500);
+}
+async function sync(){
+  if(syncing){syncT=setTimeout(sync,400);return}
+  syncing=true;
+  try{
+    const u=USER.id,now=new Date().toISOString();
+    const ops=[sb.from('settings').upsert({user_id:u,data:S,updated_at:now})];
+    if(C.length)ops.push(sb.from('clients').upsert(C.map(c=>({user_id:u,id:c.id,name:c.name,phone:c.phone||'',email:c.email||'',notes:c.notes||'',updated_at:now}))));
+    if(D.length)ops.push(sb.from('docs').upsert(D.map(d=>{const data=Object.assign({},d);delete data.id;delete data.share_token;return{user_id:u,id:d.id,share_token:d.share_token,data,updated_at:now}})));
+    const dd=[...deleted.docs],dc=[...deleted.clients];
+    if(dd.length)ops.push(sb.from('docs').delete().eq('user_id',u).in('id',dd));
+    if(dc.length)ops.push(sb.from('clients').delete().eq('user_id',u).in('id',dc));
+    const res=await Promise.all(ops);const bad=res.find(r=>r.error);if(bad)throw bad.error;
+    dd.forEach(x=>deleted.docs.delete(x));dc.forEach(x=>deleted.clients.delete(x));
+  }catch(e){console.error(e);toast("Couldn't save just now. Trying again.");setTimeout(save,5000)}
+  syncing=false;
+}
 function seed(){
   const t=today();
   C=[{id:'c1',name:"Kemi's Kitchen",phone:'',email:'',notes:'Restaurant, Lekki'},{id:'c2',name:'Northwind Fitness',phone:'',email:'',notes:'Gym chain'},{id:'c3',name:'Adeyemi & Co',phone:'',email:'',notes:'Law firm'},{id:'c4',name:'Bloom Studio',phone:'',email:'',notes:'Florist'}];
@@ -176,6 +207,7 @@ function seed(){
    {id:'d3',type:'invoice',num:'INV-002',clientId:'c3',title:'Pitch deck design',items:[{desc:'Pitch deck design',details:'15 slides',qty:1,rate:120000}],date:addDays(t,-9),due:addDays(t,-2),status:'paid',payments:[{amt:120000,at:addDays(t,-1)}],notes:'',tl:[{s:'created',at:addDays(t,-9)},{s:'sent',at:addDays(t,-9)},{s:'paid',at:addDays(t,-1)}]},
    {id:'d4',type:'invoice',num:'INV-003',clientId:'c4',title:'Menu and flyer design',items:[{desc:'Menu design',details:'',qty:1,rate:60000},{desc:'Flyer design',details:'2 sizes',qty:2,rate:15000}],date:addDays(t,-2),due:addDays(t,5),status:'sent',payments:[],notes:'',tl:[{s:'created',at:addDays(t,-2)},{s:'sent',at:addDays(t,-2)}]}
   ];
+  D.forEach(d=>d.share_token=newToken());
   save();
 }
 
@@ -228,7 +260,7 @@ function parseSentence(txt){
 }
 
 /* ---------- messages ---------- */
-function viewLink(d){return location.href.split('#')[0]+'#/view/'+d.id}
+function viewLink(d){return location.href.split('#')[0]+'#/view/'+(d.share_token||d.id)}
 function reminder(d,tone){
   const c=client(d.clientId).name, amt=money(balance(d)||total(d)), what=d.type==='quote'?'quote':'invoice', link=viewLink(d);
   const st=state(d);const when=d.type==='quote'?`is ready for your review`:st==='overdue'?`was due on ${fmtDate(d.due)}`:`is due on ${fmtDate(d.due)}`;
@@ -271,6 +303,8 @@ function render(){
   const[r,rawId]=h.split('?')[0].split('/');const id=rawId;
   const name=r||'home';
   const fn={home,docs,new:newdoc,edit:newdoc,doc,clients,client:clientPage,settings,view}[name]||home;
+  if(MODE===null)return;
+  if(name!=='view'&&MODE==='auth'){$('#nav').style.display='none';$('#app').innerHTML=authScreen();authScreen._bind();return}
   $('#nav').style.display=name==='view'?'none':'flex';
   $('#app').oninput=null;
   $('#app').innerHTML=fn(id,q,name);
@@ -298,6 +332,7 @@ function home(){
   <div class="hero"><div class="lab">You're owed <span class="chip"></span></div><div class="big">${money(o)}</div><span class="gpill">${money(thisMonthIn())} came in this month</span></div>
   <div class="duo"><a href="#/new?type=quote">${ic.up} Quote</a><a href="#/new?type=invoice">${ic.down} Invoice</a></div>
   ${promo}
+  ${MODE==='cloud'&&(S.biz==='Your Studio'||!S.acctNo)?`<a class="card" href="#/settings" style="display:flex;align-items:center;gap:12px"><div class="chip" style="width:34px;height:22px;border-radius:5px;flex:none"></div><div style="flex:1"><div style="font-weight:600">Make it yours</div><div class="small muted">Add your business name and bank details so invoices carry them.</div></div>${ic.up}</a>`:''}
   <div class="card"><div class="ch"><h3>Your clients</h3><a class="addp" href="#/clients?add=1">+ Add</a></div>
    <div class="avrow">${recentClients.map(c=>{const late=D.some(d=>d.clientId===c.id&&state(d)==='overdue');return `<a class="avi" href="#/client/${c.id}">${avatar(c,'avc').replace('</div>',late?'<i style="background:var(--bad)"></i></div>':'</div>')}<span>${esc(c.name.split(' ')[0])}</span></a>`}).join('')||'<div class="muted small">Clients show up here once you send something.</div>'}</div></div>
   <div class="card"><div class="ch"><h3>Needs you</h3><span class="muted small">${act.length}</span></div><div class="list">${act.length?act.join(''):'<div class="empty">Nothing needs you right now. Go make something.</div>'}</div></div>
@@ -329,7 +364,7 @@ docs._bind=()=>{bindRows();document.querySelectorAll('[data-f]').forEach(b=>b.on
 let draft=null;
 function newdoc(id,q,name){
   if(name==='edit'){draft=JSON.parse(JSON.stringify(D.find(d=>d.id===id)))}
-  else if(name!=='edit-live'&&(!draft||draft._fresh!==location.hash)){const type=q.get('type')||'invoice';draft={_fresh:location.hash,id:uid(),type,num:nextNum(type),clientId:q.get('client')||'',title:'',items:[{desc:'',details:'',qty:1,rate:0}],date:today(),due:addDays(today(),type==='quote'?S.validDays:S.dueDays),status:'draft',payments:[],notes:'',cur:S.currency,tl:[{s:'created',at:today()}]}}
+  else if(name!=='edit-live'&&(!draft||draft._fresh!==location.hash)){const type=q.get('type')||'invoice';draft={_fresh:location.hash,id:uid(),type,num:nextNum(type),clientId:q.get('client')||'',title:'',items:[{desc:'',details:'',qty:1,rate:0}],date:today(),due:addDays(today(),type==='quote'?S.validDays:S.dueDays),status:'draft',payments:[],notes:'',cur:S.currency,share_token:newToken(),tl:[{s:'created',at:today()}]}}
   const d=draft,editing=name.startsWith('edit');
   return `${topbar(editing?'Edit '+esc(d.num):d.type==='quote'?'New quote':'New invoice')}
   ${editing?'':`<div class="seg" style="margin-bottom:12px"><button data-type="quote" class="${d.type==='quote'?'on':''}">Quote</button><button data-type="invoice" class="${d.type==='invoice'?'on':''}">Invoice</button></div>
@@ -372,18 +407,18 @@ newdoc._bind=(id,q,name)=>{
 };
 
 /* ---------- DOCUMENT ---------- */
-function paperHTML(d){
-  const c=client(d.clientId),st=state(d),col=S.color||'#111111';
+function paperHTML(d,s,c){
+  s=s||S;c=c||client(d.clientId);const st=state(d),col=s.color||'#111111';
   return `<div class="paper" id="paper">
-  <div class="ph"><div>${S.logo?`<img class="blogo" src="${S.logo}" alt="">`:`<div style="font-weight:800;font-size:15px;margin-bottom:8px">${esc(S.biz)}</div>`}<div class="doctype" style="color:${col}">${d.type==='quote'?'Quotation':'Invoice'}</div>${d.title?`<div style="margin-top:6px;font-weight:600">${esc(d.title)}</div>`:''}</div>
+  <div class="ph"><div>${s.logo?`<img class="blogo" src="${s.logo}" alt="">`:`<div style="font-weight:800;font-size:15px;margin-bottom:8px">${esc(s.biz)}</div>`}<div class="doctype" style="color:${col}">${d.type==='quote'?'Quotation':'Invoice'}</div>${d.title?`<div style="margin-top:6px;font-weight:600">${esc(d.title)}</div>`:''}</div>
   <div class="meta"><div><b>${esc(d.num)}</b></div><div>Date <b>${fmtDate(d.date)}</b></div><div>${d.type==='quote'?'Valid until':'Due'} <b>${fmtDate(d.due)}</b></div>${st==='paid'?'<div style="margin-top:10px"><span class="stamp">PAID</span></div>':''}</div></div>
-  <div class="parties"><div><div class="lab2">From</div><b>${esc(S.biz)}</b>${S.email?'<div>'+esc(S.email)+'</div>':''}${S.phone?'<div>'+esc(S.phone)+'</div>':''}</div><div><div class="lab2">${d.type==='quote'?'Prepared for':'Billed to'}</div><b>${esc(c.name)}</b>${c.email?'<div>'+esc(c.email)+'</div>':''}${c.phone?'<div>'+esc(c.phone)+'</div>':''}</div></div>
+  <div class="parties"><div><div class="lab2">From</div><b>${esc(s.biz)}</b>${s.email?'<div>'+esc(s.email)+'</div>':''}${s.phone?'<div>'+esc(s.phone)+'</div>':''}</div><div><div class="lab2">${d.type==='quote'?'Prepared for':'Billed to'}</div><b>${esc(c.name)}</b>${c.email?'<div>'+esc(c.email)+'</div>':''}${c.phone?'<div>'+esc(c.phone)+'</div>':''}</div></div>
   <table><thead><tr style="background:${col}"><th>Item</th><th class="r">Qty</th><th class="r">Price</th><th class="r">Amount</th></tr></thead><tbody>
   ${d.items.map(i=>`<tr><td><b>${esc(i.desc)}</b>${i.details?`<div class="det">${esc(i.details)}</div>`:''}</td><td class="r">${i.qty}</td><td class="r">${money(i.rate,d.cur)}</td><td class="r">${money(i.qty*i.rate,d.cur)}</td></tr>`).join('')}
   </tbody></table>
   <div class="tot"><div><p><span>Subtotal</span><span>${money(total(d),d.cur)}</span></p>${paid(d)?`<p><span>Paid</span><span>− ${money(paid(d),d.cur)}</span></p>`:''}<p class="grand"><span>${d.type==='invoice'&&paid(d)?'Balance':'Total'}</span><span>${money(d.type==='invoice'&&paid(d)?balance(d):total(d),d.cur)}</span></p></div></div>
-  <div class="words">${numWords(total(d))} ${curWord[d.cur||S.currency]||''} only</div>
-  <div class="foot"><div>${S.acctNo?`<div class="lab2">Pay by bank transfer</div>${esc(S.acctName)}\n${esc(S.acctNo)}\n${esc(S.bank)}`:''}</div><div>${(d.notes||S.terms)?`<div class="lab2">Notes and terms</div>${esc(d.notes||S.terms)}`:''}</div></div>
+  <div class="words">${numWords(total(d))} ${curWord[d.cur||s.currency]||''} only</div>
+  <div class="foot"><div>${s.acctNo?`<div class="lab2">Pay by bank transfer</div>${esc(s.acctName)}\n${esc(s.acctNo)}\n${esc(s.bank)}`:''}</div><div>${(d.notes||s.terms)?`<div class="lab2">Notes and terms</div>${esc(d.notes||s.terms)}`:''}</div></div>
   </div>`;
 }
 function doc(id){
@@ -420,11 +455,11 @@ doc._bind=id=>{
    if(a==='pay')payment(d);
    if(a==='copy'){navigator.clipboard&&navigator.clipboard.writeText(viewLink(d));toast('Link copied')}
    if(a==='print')window.print();
-   if(a==='dup'){const n=JSON.parse(JSON.stringify(d));n.id=uid();n.num=nextNum(d.type);n.status='draft';n.payments=[];n.date=today();n.due=addDays(today(),d.type==='quote'?S.validDays:S.dueDays);n.tl=[{s:'created',at:today()}];delete n.fromQuote;D.push(n);save();go('/doc/'+n.id)}
-   if(a==='del'){if(confirm('Delete '+d.num+'? This cannot be undone.')){D=D.filter(x=>x.id!==d.id);save();go('/home')}}
+   if(a==='dup'){const n=JSON.parse(JSON.stringify(d));n.id=uid();n.num=nextNum(d.type);n.status='draft';n.payments=[];n.date=today();n.due=addDays(today(),d.type==='quote'?S.validDays:S.dueDays);n.tl=[{s:'created',at:today()}];n.share_token=newToken();delete n.fromQuote;D.push(n);save();go('/doc/'+n.id)}
+   if(a==='del'){if(confirm('Delete '+d.num+'? This cannot be undone.')){deleted.docs.add(d.id);D=D.filter(x=>x.id!==d.id);save();go('/home')}}
   });
 };
-function convert(qid){const q=D.find(x=>x.id===qid);const n=JSON.parse(JSON.stringify(q));n.id=uid();n.type='invoice';n.num=nextNum('invoice');n.status='draft';n.date=today();n.due=addDays(today(),S.dueDays);n.fromQuote=q.id;n.payments=[];n.tl=[{s:'created from '+q.num,at:today()}];D.push(n);q.tl.push({s:'invoiced as '+n.num,at:today()});save();toast('Invoice '+n.num+' ready');go('/doc/'+n.id)}
+function convert(qid){const q=D.find(x=>x.id===qid);const n=JSON.parse(JSON.stringify(q));n.id=uid();n.type='invoice';n.num=nextNum('invoice');n.status='draft';n.date=today();n.due=addDays(today(),S.dueDays);n.fromQuote=q.id;n.payments=[];n.tl=[{s:'created from '+q.num,at:today()}];n.share_token=newToken();D.push(n);q.tl.push({s:'invoiced as '+n.num,at:today()});save();toast('Invoice '+n.num+' ready');go('/doc/'+n.id)}
 
 /* payment: keypad screen */
 function payment(d){
@@ -471,7 +506,9 @@ clientPage._bind=id=>{bindRows();$('#editc').onclick=()=>clientForm(C.find(x=>x.
 /* ---------- SETTINGS ---------- */
 function settings(){
   const cur=['NGN','USD','GBP','EUR','GHS','KES'];
-  return `<div class="top"><div class="logo" style="font-size:22px">Settings</div></div>
+  const acct=MODE==='cloud'?`<div class="card"><div class="person">${avatar({id:USER.id,name:S.biz||USER.email})}<div class="grow"><div style="font-weight:600">${esc(USER.email)}</div><div class="small muted">Saved to your account, on any device</div></div><button class="btn sm" id="signout">Sign out</button></div></div>`
+   :`<div class="promo" id="mkacct"><div class="grow"><b>You're in demo mode</b><p>Nothing here is real. Create your account to send real quotes and invoices.</p></div><div class="coin">→</div></div>`;
+  return `<div class="top"><div class="logo" style="font-size:22px">Settings</div></div>${acct}
   <div class="card"><div class="ch"><h3>Your business</h3></div>
    <label style="margin-top:0">Business name</label><input data-s="biz" value="${esc(S.biz)}"><div class="grid2"><div><label>Email</label><input data-s="email" value="${esc(S.email)}"></div><div><label>Phone</label><input data-s="phone" value="${esc(S.phone)}"></div></div>
    <div class="grid2"><div><label>Logo</label><input type="file" accept="image/*" id="logo">${S.logo?`<div style="margin-top:8px;display:flex;align-items:center;gap:8px"><img src="${S.logo}" style="max-height:34px"><button class="btn sm" id="rmlogo">Remove</button></div>`:''}</div><div><label>Document colour</label><input type="color" data-s="color" value="${S.color}" style="height:48px;padding:4px"></div></div></div>
@@ -482,40 +519,80 @@ function settings(){
    <label>Default terms</label><textarea data-s="terms">${esc(S.terms)}</textarea></div>
   <div class="card"><div class="ch"><h3>Reminder tone</h3></div><div class="seg">${[['polite','Polite'],['firm','Firm'],['abeg','Abeg o']].map(([k,l])=>`<button data-tone="${k}" class="${S.tone===k?'on':''}">${l}</button>`).join('')}</div>
    <div class="small" style="white-space:pre-line;margin-top:12px;background:var(--soft);border-radius:14px;padding:12px;color:#555">${esc(reminder({num:'INV-004',type:'invoice',clientId:'',items:[{qty:1,rate:150000}],payments:[],due:addDays(today(),-3),status:'sent',id:'preview'}))}</div></div>
-  <div class="card"><div class="ch"><h3>Your data</h3></div><p class="muted small">Everything is saved on this device for now. Back it up now and then.</p>
+  <div class="card"><div class="ch"><h3>Your data</h3></div><p class="muted small">${MODE==='cloud'?'Download a copy of everything whenever you want one.':'Demo data lives on this device only.'}</p>
    <div class="agrid" style="margin-top:12px"><button class="btn" id="exp">Download backup</button><label class="btn" style="margin:0;font-size:13px;color:var(--text)">Restore backup<input type="file" id="imp" accept=".json" hidden></label><button class="btn danger" id="wipe" style="grid-column:span 2">Start fresh</button></div></div>`;
 }
 settings._bind=()=>{
+  const so=$('#signout');so&&(so.onclick=async()=>{await sb.auth.signOut();MODE='auth';USER=null;S=defaultSettings();C=[];D=[];location.hash='#/home';render()});
+  const mk=$('#mkacct');mk&&(mk.onclick=()=>{localStorage.removeItem(K+'demo');MODE='auth';location.hash='#/home';render()});
   document.querySelectorAll('[data-s]').forEach(i=>i.oninput=()=>{const k=i.dataset.s;S[k]=i.type==='number'?+i.value:i.value;save()});
   document.querySelectorAll('[data-s="currency"]').forEach(i=>i.onchange=()=>{S.currency=i.value;save();toast('Currency set to '+i.value)});
   document.querySelectorAll('[data-tone]').forEach(b=>b.onclick=()=>{S.tone=b.dataset.tone;save();render()});
   $('#logo').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{S.logo=r.result;save();render();toast('Logo added')};r.readAsDataURL(f)};
   const rm=$('#rmlogo');rm&&(rm.onclick=()=>{S.logo='';save();render()});
   $('#exp').onclick=()=>{const b=new Blob([JSON.stringify({S,C,D},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='paidup-backup-'+today()+'.json';a.click()};
-  $('#imp').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const j=JSON.parse(r.result);S=j.S;C=j.C;D=j.D;save();toast('Backup restored');render()}catch(x){toast("That file didn't work")}};r.readAsText(f)};
-  $('#wipe').onclick=()=>{if(confirm('Delete every client and document on this device?')){C=[];D=[];save();go('/home')}};
+  $('#imp').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const j=JSON.parse(r.result);S=Object.assign(defaultSettings(),j.S);C=j.C;D=j.D;D.forEach(d=>{if(!d.share_token)d.share_token=newToken()});save();toast('Backup restored');render()}catch(x){toast("That file didn't work")}};r.readAsText(f)};
+  $('#wipe').onclick=()=>{if(confirm('Delete every client and document?')){C.forEach(c=>deleted.clients.add(c.id));D.forEach(d=>deleted.docs.add(d.id));C=[];D=[];save();go('/home')}};
 };
 
 /* ---------- CLIENT VIEW ---------- */
-function view(id){
-  const d=D.find(x=>x.id===id);if(!d)return `<div class="card empty" style="margin-top:40px">This link isn't available on this device yet.</div>`;
-  if(d.status==='sent'){d.status='viewed';d.tl.push({s:'viewed',at:today()});save()}
-  const st=state(d);
-  return `<div class="view-wrap"><div class="noprint" style="text-align:center;margin:6px 0 16px"><div class="logo" style="font-size:18px">${esc(S.biz)}</div><div class="muted small">sent you a ${d.type}</div></div>
-  ${paperHTML(d)}
-  <div class="client-bar noprint">${d.type==='quote'&&!['accepted','declined'].includes(d.status)?`<button class="btn pri" id="vacc">Accept quote</button>`:''}${d.type==='quote'&&d.status==='accepted'?'<span class="badge b-accepted" style="padding:9px 14px">✓ You accepted this quote</span>':''}
-  ${d.type==='invoice'&&st!=='paid'&&S.acctNo?`<button class="btn pri" id="vpay">Pay ${money(balance(d),d.cur)}</button>`:''}${st==='paid'?'<span class="badge b-paid" style="padding:9px 14px">✓ Paid. Thank you!</span>':''}<button class="btn" onclick="window.print()">Download PDF</button></div>
-  <div class="noprint muted small" style="text-align:center;margin-top:24px">Made with <b style="color:#111">Paidup</b></div></div>`;
-}
-view._bind=id=>{const d=D.find(x=>x.id===id);if(!d)return;
-  const a=$('#vacc');a&&(a.onclick=()=>{d.status='accepted';d.tl.push({s:'accepted by client',at:today()});save();render();toast('Quote accepted. '+S.biz+' has been notified.')});
-  const p=$('#vpay');p&&(p.onclick=()=>sheet(`<div class="top" style="margin-bottom:8px"><span style="width:38px"></span><div class="ttl">Pay by bank transfer</div><button class="icb" id="vx">✕</button></div>
-   <div class="keyamt" style="padding:16px 0">${money(balance(d),d.cur)}</div><div class="muted small" style="text-align:center;margin:-8px 0 14px">Use ${esc(d.num)} as your reference</div>
-   <div class="card"><div class="small muted">Account name</div><div style="font-weight:600;margin-bottom:10px">${esc(S.acctName)}</div><div class="small muted">Account number</div><div style="font-weight:700;font-size:22px;letter-spacing:1px;margin-bottom:10px">${esc(S.acctNo)}</div><div class="small muted">Bank</div><div style="font-weight:600">${esc(S.bank)}</div></div>
-   <div class="agrid"><button class="btn" id="cpy">Copy number</button><button class="btn pri" id="done">I've sent it</button></div>`,(m,close)=>{m.querySelector('#vx').onclick=close;m.querySelector('#cpy').onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(S.acctNo);toast('Copied')};m.querySelector('#done').onclick=()=>{d.tl.push({s:'client says paid',at:today()});save();close();toast('Thanks! '+S.biz+' will confirm shortly.')}}));
+function view(){return `<div class="empty" style="margin-top:80px">Opening…</div>`}
+view._bind=async token=>{
+  let d,s,c,owner=D.some(x=>x.share_token===token||x.id===token);
+  if(MODE==='demo'){d=D.find(x=>x.share_token===token||x.id===token);s=S;c=d&&client(d.clientId)}
+  else if(sb){try{const r=await sb.rpc('get_shared_doc',{token});if(r.data){d=r.data.doc;s=Object.assign(defaultSettings(),r.data.biz||{});c=r.data.client||{name:''}}}catch(e){}}
+  if(!d){$('#app').innerHTML=`<div class="card empty" style="margin-top:60px">This link doesn't open anything. Ask whoever sent it to share it again.</div>`;return}
+  d.cur=d.cur||s.currency;
+  const fire=async ev=>{if(MODE==='demo'){const x=D.find(y=>y.id===d.id);if(ev==='viewed'&&x.status==='sent'){x.status='viewed';x.tl.push({s:'viewed',at:today()})}if(ev==='accepted'){x.status='accepted';x.tl.push({s:'accepted by client',at:today()})}if(ev==='client_paid')x.tl.push({s:'client says paid',at:today()});save();return x}
+    const r=await sb.rpc('shared_doc_event',{token:d.share_token,ev});if(r.error)throw r.error;return Object.assign(d,r.data)};
+  if(d.status==='sent'&&!owner){try{await fire('viewed')}catch(e){}}
+  const paint=()=>{const st=state(d);
+   $('#app').innerHTML=`<div class="view-wrap"><div class="noprint" style="text-align:center;margin:6px 0 16px"><div class="logo" style="font-size:18px">${esc(s.biz)}</div><div class="muted small">sent you a ${d.type==='quote'?'quote':'invoice'}</div></div>
+   ${paperHTML(d,s,c)}
+   <div class="client-bar noprint">${d.type==='quote'&&!['accepted','declined'].includes(d.status)?`<button class="btn pri" id="vacc">Accept quote</button>`:''}${d.type==='quote'&&d.status==='accepted'?'<span class="badge b-accepted" style="padding:9px 14px">✓ You accepted this quote</span>':''}
+   ${d.type==='invoice'&&st!=='paid'&&s.acctNo?`<button class="btn pri" id="vpay">Pay ${money(balance(d),d.cur)}</button>`:''}${st==='paid'?'<span class="badge b-paid" style="padding:9px 14px">✓ Paid. Thank you!</span>':''}<button class="btn" onclick="window.print()">Download PDF</button></div>
+   ${owner?'<div class="noprint small muted" style="text-align:center">This is what your client sees.</div>':''}
+   <div class="noprint muted small" style="text-align:center;margin-top:24px">Made with <b style="color:#111">Paidup</b></div></div>`;
+   const a=$('#vacc');a&&(a.onclick=async()=>{a.disabled=true;try{await fire('accepted');d.status='accepted';paint();toast('Quote accepted. '+s.biz+' can see it now.')}catch(e){a.disabled=false;toast("That didn't go through. Try again.")}});
+   const p=$('#vpay');p&&(p.onclick=()=>sheet(`<div class="top" style="margin-bottom:8px"><span style="width:38px"></span><div class="ttl">Pay by bank transfer</div><button class="icb" id="vx">✕</button></div>
+    <div class="keyamt" style="padding:16px 0">${money(balance(d),d.cur)}</div><div class="muted small" style="text-align:center;margin:-8px 0 14px">Use ${esc(d.num)} as your reference</div>
+    <div class="card"><div class="small muted">Account name</div><div style="font-weight:600;margin-bottom:10px">${esc(s.acctName)}</div><div class="small muted">Account number</div><div style="font-weight:700;font-size:22px;letter-spacing:1px;margin-bottom:10px">${esc(s.acctNo)}</div><div class="small muted">Bank</div><div style="font-weight:600">${esc(s.bank)}</div></div>
+    <div class="agrid"><button class="btn" id="cpy">Copy number</button><button class="btn pri" id="done">I've sent it</button></div>`,(m,close)=>{m.querySelector('#vx').onclick=close;m.querySelector('#cpy').onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(s.acctNo);toast('Copied')};m.querySelector('#done').onclick=async()=>{try{await fire('client_paid')}catch(e){}close();toast('Thanks! '+s.biz+' will confirm shortly.')}}));
+  };
+  paint();
 };
 
-render();
+/* ---------- AUTH ---------- */
+function authScreen(){return `<div style="min-height:86vh;display:flex;flex-direction:column;justify-content:center">
+ <div class="logo" style="margin-bottom:30px">Paidup</div>
+ <div class="big" style="font-size:40px;margin:0 0 10px">Quote it.<br>Invoice it.<br>Get paid.</div>
+ <p class="muted" style="margin-bottom:22px">Send clients a proper quote on WhatsApp, turn it into an invoice in one tap, and stop chasing money.</p>
+ <div class="card" id="authcard"><label style="margin-top:0">Your email</label><input id="aemail" type="email" placeholder="you@studio.com" autocomplete="email"><button class="btn pri block" id="asend" style="margin-top:12px">Send me a sign-in link</button><p class="small muted" style="margin-top:10px;text-align:center">No password. Tap the link in your email and you're in.</p></div>
+ <button class="btn block" id="ademo" style="background:transparent;border:0;color:#666">Try the demo first</button></div>`}
+authScreen._bind=()=>{
+  const send=async()=>{const email=$('#aemail').value.trim();if(!/^\S+@\S+\.\S+$/.test(email)){toast('Enter your email');return}
+    const b=$('#asend');b.disabled=true;b.textContent='Sending…';
+    const{error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin+location.pathname}});
+    if(error){b.disabled=false;b.textContent='Send me a sign-in link';toast(error.message);return}
+    $('#authcard').innerHTML=`<div style="text-align:center;padding:8px 0"><div class="tick" style="width:56px;height:56px;border-radius:50%;background:var(--lime);display:grid;place-items:center;margin:0 auto 12px;font-weight:800;font-size:24px">✓</div><div style="font-weight:600;font-size:16px">Check your email</div><p class="muted small" style="margin:6px 0 14px">We sent a sign-in link to ${esc(email)}. Open it on this phone.</p><button class="btn sm" id="again">Use a different email</button></div>`;
+    $('#again').onclick=()=>render()};
+  $('#asend').onclick=send;$('#aemail').onkeydown=e=>{if(e.key==='Enter')send()};
+  $('#ademo').onclick=()=>{localStorage.setItem(K+'demo','1');MODE='demo';loadDemo();go('/home');render()};
+  const err=new URLSearchParams(location.hash.replace(/^#/,'')).get('error_description');if(err)toast(err.replace(/\+/g,' '));
+};
+
+/* ---------- BOOT ---------- */
+async function boot(){
+  let session=null;
+  if(sb){try{const r=await sb.auth.getSession();session=r.data.session}catch(e){}}
+  if(session){USER=session.user;MODE='cloud';try{await loadCloud()}catch(e){console.error(e);toast("Couldn't load your data. Check your connection.")}}
+  else if(localStorage.getItem(K+'demo')==='1'){MODE='demo';loadDemo()}
+  else MODE='auth';
+  if(/access_token|error_description/.test(location.hash))history.replaceState(null,'',location.pathname+(MODE==='auth'?'':'#/home'));
+  render();
+}
+sb&&sb.auth.onAuthStateChange((ev,session)=>{if(ev==='SIGNED_IN'&&MODE&&MODE!=='cloud'&&session){USER=session.user;MODE='cloud';localStorage.removeItem(K+'demo');loadCloud().then(()=>{history.replaceState(null,'',location.pathname+'#/home');render()})}});
+boot();
 </script>
 </body>
 </html>
