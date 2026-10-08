@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>HQ · Control room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#ECECEC;--card:#fff;--soft:#F3F3F3;--line:#E7E7E7;--text:#111;--muted:#8B8B8B;--lime:#C9F230;--ink:#111;--ok:#22A55B;--bad:#E5484D}
+*{box-sizing:border-box;margin:0;padding:0}
+html{overflow-x:hidden}
+html,body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+body{min-height:100vh;overflow-x:hidden}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 20px 60px}
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:20px;letter-spacing:-.02em}
+.dot{width:14px;height:14px;border-radius:50%;border:3px solid var(--ink);background:var(--lime)}
+.logo small{font-weight:600;font-size:12px;color:var(--muted);letter-spacing:0;margin-left:2px}
+.sp{flex:1}
+.who{font-size:13px;color:var(--muted)}
+.btn{white-space:nowrap;height:40px;padding:0 16px;border-radius:999px;background:var(--ink);color:#fff;font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:8px}
+.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btn:disabled{opacity:.5;cursor:default}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.tab{height:38px;padding:0 16px;border-radius:999px;background:#fff;border:1px solid var(--line);font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:8px}
+.tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.tab.on i{background:var(--lime)}
+.tab i{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.tab.add{color:var(--muted);border-style:dashed;background:transparent;cursor:default}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+.seg{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px}
+.seg button{height:32px;padding:0 14px;border-radius:999px;font-size:13px;font-weight:600;color:var(--muted)}
+.seg button.on{background:var(--soft);color:var(--ink)}
+.chk{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);background:#fff;border:1px solid var(--line);height:38px;padding:0 14px;border-radius:999px;cursor:pointer;user-select:none}
+.chk input{accent-color:#111}
+.upd{font-size:12px;color:var(--muted);margin-left:auto}
+.grid{display:grid;gap:14px}
+.k5{grid-template-columns:repeat(5,minmax(0,1fr))}
+.card{background:var(--card);border-radius:22px;padding:18px}
+.kpi .l{font-size:13px;color:var(--muted);font-weight:500}
+.kpi .v{font-size:34px;font-weight:800;letter-spacing:-.03em;margin:8px 0 6px;line-height:1}
+.kpi .s{font-size:12px;color:var(--muted);line-height:1.4}
+.kpi .s b{color:var(--ink);font-weight:600}
+.pill{display:inline-block;background:var(--lime);color:#111;font-weight:700;font-size:11px;padding:3px 8px;border-radius:999px}
+.pill.grey{background:var(--soft);color:var(--muted)}
+.kpi.hero{background:var(--ink);color:#fff}
+.kpi.hero .l,.kpi.hero .s{color:#a9a9a9}
+.kpi.hero .s b{color:var(--lime)}
+.row2{grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);margin-top:14px}
+.h{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.sm-only{display:none}
+.h h3{font-size:15px;font-weight:700}
+.h .sp{flex:1}
+.leg{display:flex;gap:12px;font-size:12px;color:var(--muted)}
+.leg span{display:inline-flex;align-items:center;gap:6px}
+.leg i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.chart{width:100%;height:auto;display:block}
+div.chart{height:220px}
+.funnel .st{margin-bottom:12px}
+.funnel .t{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
+.funnel .t b{font-weight:700}
+.funnel .t span{color:var(--muted)}
+.track{height:12px;border-radius:999px;background:var(--soft);overflow:hidden}
+.fill{height:100%;border-radius:999px;background:var(--ink);min-width:4px}
+.fill.l{background:var(--lime)}
+.u4{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.mini{background:var(--soft);border-radius:16px;padding:14px}
+.mini .v{font-size:24px;font-weight:800;letter-spacing:-.02em}
+.mini .l{font-size:12px;color:var(--muted);margin-top:4px}
+.money{margin-top:14px}
+.mrow{margin-top:10px}
+.mrow .t{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;gap:10px}
+.mrow .t span{color:var(--muted)}
+.row3{grid-template-columns:minmax(0,1fr) minmax(0,1fr);margin-top:14px}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;color:var(--muted);font-weight:500;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top;overflow-wrap:anywhere}
+.tbl tr:last-child td{border-bottom:0}
+.tbl .m{color:var(--muted);white-space:nowrap}
+.scroll{max-height:420px;overflow:auto;margin:0 -8px;padding:0 8px}
+.search{height:36px;border-radius:999px;border:1px solid var(--line);background:var(--soft);padding:0 14px;font-size:13px;width:180px;outline:none}
+.empty{color:var(--muted);font-size:13px;padding:22px 4px;text-align:center}
+.note{font-size:12px;color:var(--muted);margin-top:12px;line-height:1.5}
+.banner{background:var(--lime);border-radius:16px;padding:12px 16px;font-size:13px;font-weight:600;margin-bottom:16px}
+.center{min-height:80vh;display:flex;align-items:center;justify-content:center}
+.login{width:100%;max-width:400px;text-align:left}
+.login h1{font-size:28px;font-weight:800;letter-spacing:-.03em;margin:18px 0 6px}
+.login p{color:var(--muted);font-size:14px;line-height:1.5;margin-bottom:18px}
+.login input{width:100%;height:50px;border-radius:14px;border:1px solid var(--line);background:var(--soft);padding:0 16px;font-size:15px;outline:none;margin-bottom:10px}
+.login .btn{width:100%;justify-content:center;height:50px}
+.msg{font-size:13px;margin-top:12px;line-height:1.5}
+.msg.bad{color:var(--bad)}
+.skel{color:transparent!important;background:var(--soft);border-radius:8px}
+@media (max-width:980px){.k5{grid-template-columns:repeat(2,minmax(0,1fr))}.k5 .kpi.hero{grid-column:1/-1}.row2,.row3{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:520px){.tab.add{display:none}.tab{padding:0 13px}.sm-only{display:block}.wl-h .search{order:9;flex:1 1 100%;width:auto}.wrap{padding:16px 14px 50px}.u4{grid-template-columns:repeat(2,minmax(0,1fr))}.kpi .v{font-size:28px}.upd{margin-left:0;width:100%}.search{width:130px}.hide-sm{display:none}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ===== Products plugged into HQ =====
+   Each product exposes one secure function, hq_stats(days, include_team), that
+   returns the same shape. To plug in a new product, add one entry here. */
+const PRODUCTS=[
+  {slug:'setul',name:'Setul',site:'../',app:'../app/',sb:'https://rsmecdjskwhrqpobivvg.supabase.co',key:'sb_publishable_FCa5SnOusl-t3-mwai4PZw_9M32lAli'}
+];
+const HOME=PRODUCTS[0];
+const sb=supabase.createClient(HOME.sb,HOME.key,{auth:{persistSession:true,detectSessionInUrl:true,flowType:'implicit'}});
+const S={product:PRODUCTS[0].slug,days:30,team:false,data:null,user:null,loading:false,err:'',q:'',sample:/[?&]sample=1/.test(location.search),at:null};
+const $=s=>document.querySelector(s);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nf=n=>new Intl.NumberFormat('en-NG').format(n||0);
+const money=(n,c)=>{try{return new Intl.NumberFormat('en-NG',{style:'currency',currency:c||'NGN',maximumFractionDigits:0}).format(n||0)}catch(e){return (c||'')+' '+nf(Math.round(n||0))}};
+const pct=(a,b)=>b?Math.round(a/b*100):0;
+const ago=t=>{if(!t)return 'Never';const s=(Date.now()-new Date(t))/1000;if(s<60)return 'Just now';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';if(s<86400*30)return Math.floor(s/86400)+'d ago';return new Date(t).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})};
+const day=t=>new Date(t).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+
+function sampleData(days){
+  const series=[];let w=0,u=0;
+  for(let i=days-1;i>=0;i--){const d=new Date(Date.now()-i*864e5);const wl=Math.max(0,Math.round(3+Math.sin(i/3)*3+(days-i)/6+Math.random()*3));const su=Math.max(0,Math.round(wl*.35+Math.random()*2));w+=wl;u+=su;series.push({day:d.toISOString().slice(0,10),waitlist:wl,signups:su,docs:Math.round(su*1.8+Math.random()*4)})}
+  const names=['Kemi Adebayo','Tunde Bello','Chioma Okafor','Ifeoma Nwosu','Seyi Lawal','Halima Musa','Emeka Obi','Zainab Yusuf'];
+  const works=['Designer','Photographer','Caterer','Developer','Video editor','Fashion','Copywriter','Event planner'];
+  return {product:'setul',days,kpis:{waitlist:w+40,waitlist_new:w,users:u+12,users_new:u,users_unconfirmed:4,active_7:Math.round(u*.4),active_30:Math.round(u*.7),activated:Math.round(u*.55),subscriptions:null,mrr:null},
+    usage:{quotes:86,invoices:142,sent:190,paid_invoices:97,docs_period:150,money:[{cur:'NGN',invoiced:18450000,collected:12930000},{cur:'USD',invoiced:6200,collected:4100}]},
+    series,
+    waitlist_recent:names.map((n,i)=>({name:n,email:n.toLowerCase().replace(' ','.')+'@example.com',whatsapp:i%2?'+234 80 0000 00'+i:'',work:works[i],created_at:new Date(Date.now()-i*7e6).toISOString()})),
+    users_recent:names.slice(0,6).map((n,i)=>({email:n.split(' ')[0].toLowerCase()+'@example.com',created_at:new Date(Date.now()-i*9e7).toISOString(),confirmed:i!==4,last_active:i===4?null:new Date(Date.now()-i*3e7).toISOString(),docs:[12,7,3,0,0,1][i]}))};
+}
+
+async function boot(){
+  if(S.sample){S.user={email:'sample'};S.data=sampleData(S.days);S.at=new Date();return render()}
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){return renderLogin()}
+  S.user=session.user;
+  const {data:ok,error}=await sb.rpc('hq_is_admin');
+  if(error||!ok){return renderDenied()}
+  render();load();
+}
+sb.auth.onAuthStateChange((ev,session)=>{if(ev==='SIGNED_IN'&&!S.user&&!S.sample){boot()}if(ev==='SIGNED_OUT'){S.user=null;S.data=null;renderLogin()}});
+
+async function load(){
+  if(S.sample){S.data=sampleData(S.days);S.at=new Date();return render()}
+  S.loading=true;S.err='';render();
+  const {data,error}=await sb.rpc('hq_stats',{days:S.days,include_team:S.team});
+  S.loading=false;
+  if(error){S.err=error.code==='42501'?'This account is not on the HQ team.':'Could not load the numbers. Try refresh.'}else{S.data=data;S.at=new Date()}
+  render();
+}
+setInterval(()=>{if(document.visibilityState==='visible'&&S.user&&!S.loading&&!S.sample&&S.data)load()},60000);
+
+function renderLogin(msg,bad){
+  $('#app').innerHTML=`<div class="wrap center"><div class="card login">
+    <div class="logo"><span class="dot"></span>HQ<small>Control room</small></div>
+    <h1>Sign in</h1>
+    <p>Team only. Enter your email and we'll send you a sign-in link.</p>
+    <form id="lf"><input id="em" type="email" required placeholder="you@email.com" autocomplete="email"><button class="btn" id="lb">Send sign-in link</button></form>
+    ${msg?`<div class="msg ${bad?'bad':''}">${esc(msg)}</div>`:''}
+  </div></div>`;
+  $('#lf').onsubmit=async e=>{e.preventDefault();const email=$('#em').value.trim();$('#lb').disabled=true;$('#lb').textContent='Sending…';
+    const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin+location.pathname,shouldCreateUser:false}});
+    if(error)renderLogin(/not.*found|signups/i.test(error.message)?'That email has no account here.':'Could not send the link. Wait a minute and try again.',true);
+    else renderLogin('Check your inbox for the sign-in link. Open it on this device.');}
+}
+function renderDenied(){
+  $('#app').innerHTML=`<div class="wrap center"><div class="card login">
+    <div class="logo"><span class="dot"></span>HQ<small>Control room</small></div>
+    <h1>Team only</h1><p>You're signed in as ${esc(S.user?.email)}, but this account isn't on the HQ team.</p>
+    <button class="btn ghost" id="so">Sign out</button></div></div>`;
+  $('#so').onclick=()=>sb.auth.signOut();
+}
+
+function chart(series){
+  if(!series||!series.length)return '<div class="empty">No data yet</div>';
+  const W=Math.round(Math.max(300,Math.min(760,(window.innerWidth||760)-(window.innerWidth>980?440:60)))),H=window.innerWidth<520?200:220,pl=30,pr=6,pt=10,pb=24,n=series.length;
+  const max=Math.max(1,...series.map(s=>Math.max(s.waitlist,s.signups)));
+  const nice=max<=4?4:Math.ceil(max/4)*4;
+  const bw=(W-pl-pr)/n,gw=Math.max(1.5,Math.min(9,bw*0.36));
+  const y=v=>pt+(H-pt-pb)*(1-v/nice);
+  let g='';
+  for(let i=0;i<=4;i++){const v=nice/4*i,yy=y(v);g+=`<line x1="${pl}" x2="${W-pr}" y1="${yy}" y2="${yy}" stroke="#EFEFEF"/><text x="${pl-6}" y="${yy+4}" text-anchor="end" font-size="10" fill="#9a9a9a">${v}</text>`}
+  const step=Math.ceil(n/(W<420?4:7));
+  series.forEach((s,i)=>{const cx=pl+bw*i+bw/2;
+    const h1=(H-pt-pb)*s.waitlist/nice,h2=(H-pt-pb)*s.signups/nice;
+    g+=`<g><title>${day(s.day)}: ${s.waitlist} joined waitlist, ${s.signups} new accounts</title>
+      <rect x="${cx-gw-0.5}" y="${H-pb-h1}" width="${gw}" height="${Math.max(h1,s.waitlist?2:0)}" rx="2" fill="#C9F230"/>
+      <rect x="${cx+0.5}" y="${H-pb-h2}" width="${gw}" height="${Math.max(h2,s.signups?2:0)}" rx="2" fill="#111"/>
+      <rect x="${cx-bw/2}" y="${pt}" width="${bw}" height="${H-pt-pb}" fill="transparent"/></g>`;
+    if(i%step===0||i===n-1)g+=`<text x="${cx}" y="${H-6}" text-anchor="middle" font-size="10" fill="#9a9a9a">${day(s.day)}</text>`});
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" >${g}</svg>`;
+}
+
+function csv(rows){
+  const head=['Name','Email','WhatsApp','Work','Joined'];
+  const lines=[head].concat(rows.map(r=>[r.name,r.email,r.whatsapp,r.work,new Date(r.created_at).toISOString()]));
+  const blob=new Blob([lines.map(l=>l.map(c=>`"${String(c??'').replace(/"/g,'""')}"`).join(',')).join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`setul-waitlist-${new Date().toISOString().slice(0,10)}.csv`;a.click();
+}
+
+function render(){
+  const d=S.data,k=d?.kpis||{},u=d?.usage||{},sk=!d?'skel':'';
+  const P=PRODUCTS.find(p=>p.slug===S.product);
+  const wl=(d?.waitlist_recent||[]).filter(r=>!S.q||[r.name,r.email,r.work,r.whatsapp].join(' ').toLowerCase().includes(S.q.toLowerCase()));
+  const funnel=[['Waitlist',k.waitlist,'l'],['Accounts',k.users,''],['Using it',k.activated,''],['Paying',k.subscriptions??0,'l']];
+  const fmax=Math.max(1,...funnel.map(f=>f[1]||0));
+  const rangeTxt=`last ${S.days} days`;
+  $('#app').innerHTML=`<div class="wrap">
+  <div class="top">
+    <div class="logo"><span class="dot"></span>HQ<small>Control room</small></div>
+    <div class="sp"></div>
+    <span class="who hide-sm">${S.sample?'Sample mode':esc(S.user?.email)}</span>
+    <button class="btn ghost" id="rf" ${S.loading?'disabled':''}>${S.loading?'Refreshing…':'Refresh'}</button>
+    ${S.sample?'':'<button class="btn ghost" id="so">Sign out</button>'}
+  </div>
+  ${S.sample?'<div class="banner">Sample numbers so you can see the layout. These are not real users.</div>':''}
+  ${S.err?`<div class="banner" style="background:#FDE7E8;color:#B4232A">${esc(S.err)}</div>`:''}
+  <div class="tabs">
+    ${PRODUCTS.map(p=>`<button class="tab ${p.slug===S.product?'on':''}" data-p="${p.slug}"><i></i>${esc(p.name)}</button>`).join('')}
+    <span class="tab add" title="Your next product plugs in here">+ Next product</span>
+    <div class="sp"></div>
+    <a class="tab" href="${P.site}" target="_blank" rel="noopener">Website ↗</a>
+    <a class="tab" href="${P.app}" target="_blank" rel="noopener">App ↗</a>
+  </div>
+  <div class="bar">
+    <div class="seg">${[7,30,90].map(n=>`<button data-d="${n}" class="${S.days===n?'on':''}">${n} days</button>`).join('')}</div>
+    <label class="chk"><input type="checkbox" id="tm" ${S.team?'checked':''}>Count my own account</label>
+    <span class="upd">${S.at?'Updated '+S.at.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})+' · refreshes every minute':''}</span>
+  </div>
+
+  <div class="grid k5">
+    <div class="card kpi hero"><div class="l">Waitlist</div><div class="v ${sk}">${nf(k.waitlist)}</div><div class="s"><b>+${nf(k.waitlist_new)}</b> in the ${rangeTxt}</div></div>
+    <div class="card kpi"><div class="l">Accounts</div><div class="v ${sk}">${nf(k.users)}</div><div class="s"><b>+${nf(k.users_new)}</b> in the ${rangeTxt}${k.users_unconfirmed?` · ${nf(k.users_unconfirmed)} never confirmed`:''}</div></div>
+    <div class="card kpi"><div class="l">Active this week</div><div class="v ${sk}">${nf(k.active_7)}</div><div class="s"><b>${nf(k.active_30)}</b> active in 30 days</div></div>
+    <div class="card kpi"><div class="l">Using it</div><div class="v ${sk}">${nf(k.activated)}</div><div class="s"><b>${pct(k.activated,k.users)}%</b> of accounts made a quote or invoice</div></div>
+    <div class="card kpi"><div class="l">Subscriptions</div><div class="v ${sk}">${k.subscriptions==null?'–':nf(k.subscriptions)}</div><div class="s">${k.subscriptions==null?'<span class="pill grey">Starts with pricing</span>':`<b>${money(k.mrr)}</b> a month`}</div></div>
+  </div>
+
+  <div class="grid row2">
+    <div class="card">
+      <div class="h"><h3>Growth</h3><div class="sp"></div><div class="leg"><span><i style="background:#C9F230"></i>Joined waitlist</span><span><i style="background:#111"></i>New accounts</span></div></div>
+      ${d?chart(d.series):'<div class="chart skel"></div>'}
+    </div>
+    <div class="card funnel">
+      <div class="h"><h3>Funnel</h3></div>
+      ${funnel.map(([l,v,c],i)=>`<div class="st"><div class="t"><b>${l}</b><span>${nf(v)}${i?` · ${pct(v,funnel[i-1][1])}% of ${funnel[i-1][0].toLowerCase()}`:''}</span></div><div class="track"><div class="fill ${c}" style="width:${pct(v||0,fmax)}%"></div></div></div>`).join('')}
+      <div class="note">Paying fills in once subscriptions are switched on.</div>
+    </div>
+  </div>
+
+  <div class="grid row2">
+    <div class="card">
+      <div class="h"><h3>What people are doing</h3><div class="sp"></div><span class="who">All time</span></div>
+      <div class="grid u4">
+        <div class="mini"><div class="v">${nf(u.quotes)}</div><div class="l">Quotes made</div></div>
+        <div class="mini"><div class="v">${nf(u.invoices)}</div><div class="l">Invoices made</div></div>
+        <div class="mini"><div class="v">${nf(u.sent)}</div><div class="l">Sent to clients</div></div>
+        <div class="mini"><div class="v">${nf(u.paid_invoices)}</div><div class="l">Invoices fully paid</div></div>
+      </div>
+      <div class="money">${(u.money||[]).length?u.money.map(m=>`<div class="mrow"><div class="t"><b>${money(m.collected,m.cur)} collected</b><span>of ${money(m.invoiced,m.cur)} invoiced · ${pct(m.collected,m.invoiced)}%</span></div><div class="track"><div class="fill l" style="width:${pct(m.collected,m.invoiced)}%"></div></div></div>`).join(''):'<div class="note">Money invoiced and collected through Setul shows here once people start billing.</div>'}</div>
+    </div>
+    <div class="card">
+      <div class="h"><h3>Newest accounts</h3></div>
+      ${(d?.users_recent||[]).length?`<div class="scroll"><table class="tbl"><thead><tr><th>Email</th><th>Docs</th><th>Last active</th></tr></thead><tbody>
+        ${d.users_recent.map(r=>`<tr><td>${esc(r.email)}${r.confirmed?'':' <span class="pill grey">unconfirmed</span>'}<div class="m" style="margin-top:3px">Joined ${ago(r.created_at)}</div></td><td>${nf(r.docs)}</td><td class="m">${ago(r.last_active)}</td></tr>`).join('')}
+      </tbody></table></div>`:'<div class="empty">No accounts yet</div>'}
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="h wl-h"><h3>Waitlist</h3><span class="pill">${nf(k.waitlist)}</span><div class="sp"></div>
+      <input class="search" id="q" placeholder="Search" value="${esc(S.q)}">
+      <button class="btn ghost" id="dl" ${(d?.waitlist_recent||[]).length?'':'disabled'}><span class="hide-sm">Download&nbsp;</span>CSV</button></div>
+    ${wl.length?`<div class="scroll"><table class="tbl"><thead><tr><th>Name</th><th class="hide-sm">Email</th><th class="hide-sm">WhatsApp</th><th class="hide-sm">Work</th><th>Joined</th></tr></thead><tbody>
+      ${wl.map(r=>`<tr><td><b style="font-weight:600">${esc(r.name)}</b><div class="sm-only m" style="margin-top:3px;white-space:normal">${esc(r.email)}</div></td><td class="hide-sm">${esc(r.email)}</td><td class="hide-sm">${r.whatsapp?`<a href="https://wa.me/${esc(String(r.whatsapp).replace(/\D/g,''))}" target="_blank" rel="noopener" style="color:inherit">${esc(r.whatsapp)}</a>`:'<span class="m">–</span>'}</td><td class="hide-sm">${esc(r.work)||'<span class="m">–</span>'}</td><td class="m">${ago(r.created_at)}</td></tr>`).join('')}
+    </tbody></table></div>`:`<div class="empty">${S.q?'No matches':'Nobody on the waitlist yet'}</div>`}
+  </div>
+  <div class="note">Only your HQ login can open these numbers. Your users' clients and invoice details are never shown here, only totals.</div>
+  </div>`;
+  const on=(s,ev,fn)=>{const el=$(s);if(el)el[ev]=fn};
+  on('#rf','onclick',load);
+  on('#so','onclick',()=>sb.auth.signOut());
+  on('#tm','onchange',e=>{S.team=e.target.checked;load()});
+  on('#dl','onclick',()=>csv(d.waitlist_recent));
+  document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{S.days=+b.dataset.d;load()});
+  document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{S.product=b.dataset.p;load()});
+  const q=$('#q');if(q)q.oninput=e=>{S.q=e.target.value;const pos=e.target.selectionStart;render();const nq=$('#q');nq.focus();nq.setSelectionRange(pos,pos)};
+}
+let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{if(S.data)render()},200)});
+boot();
+</script>
+</body>
+</html>
