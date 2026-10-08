@@ -163,7 +163,7 @@ function renderLogin(msg,bad){
   </div></div>`;
   $('#lf').onsubmit=async e=>{e.preventDefault();const email=$('#em').value.trim();$('#lb').disabled=true;$('#lb').textContent='Sending…';
     const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin+location.pathname,shouldCreateUser:false}});
-    if(error)renderLogin(/not.*found|signups/i.test(error.message)?'That email has no account here.':'Could not send the link. Wait a minute and try again.',true);
+    if(error)renderLogin(/signups|not.*found/i.test(error.message)?'That email has no HQ account. Use thedesyner01@gmail.com.':(error.status===429||/rate limit/i.test(error.message))?'Too many sign-in emails were sent in the last hour. Try again in about an hour.':'Could not send the link: '+error.message,true);
     else renderLogin('Check your inbox for the sign-in link. Open it on this device.');}
 }
 function renderDenied(){
