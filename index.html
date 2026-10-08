@@ -27,7 +27,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .hero .gpill{background:var(--soft)}
 .lab{display:inline-flex;align-items:center;gap:8px;color:#555;font-size:13px}
 .chip{width:22px;height:14px;border-radius:3px;background:var(--lime);display:inline-block}
-.big{font-size:44px;font-weight:700;letter-spacing:-2px;line-height:1.1;margin:8px 0 10px}
+.big{font-size:44px;font-weight:700;letter-spacing:-2px;line-height:1.1;margin:8px 0 10px}.big .cur{margin-right:3px;letter-spacing:0;font-weight:600}
 .gpill{display:inline-block;background:#E2E2E2;color:#666;padding:5px 12px;border-radius:999px;font-size:12px}
 .duo{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
 .duo a,.duo button{display:flex;align-items:center;justify-content:center;gap:8px;height:52px;background:#fff;border-radius:16px;font-weight:600;border:0;cursor:pointer}
@@ -66,11 +66,15 @@ button,input,select,textarea{font:inherit;color:inherit}
 .agrid .btn{width:100%}
 label{display:block;font-size:12px;font-weight:600;color:#666;margin:14px 0 6px}
 input,select,textarea{width:100%;padding:13px 14px;border-radius:14px;background:var(--soft);border:1px solid transparent;outline:none}
+input:not([type=checkbox]):not([type=radio]):not([type=file]),select{height:48px}
+input[type=date]{-webkit-appearance:none;appearance:none;display:block;min-width:0;line-height:20px}
+input[type=date]::-webkit-date-and-time-value{text-align:left}
+input[type=color]{-webkit-appearance:none;appearance:none;cursor:pointer}input[type=color]::-webkit-color-swatch-wrapper{padding:0}input[type=color]::-webkit-color-swatch{border:0;border-radius:10px}input[type=color]::-moz-color-swatch{border:0;border-radius:10px}
 input:focus,select:focus,textarea:focus{border-color:var(--ink);background:#fff}
 textarea{min-height:72px;resize:vertical}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .magic{display:flex;gap:8px;align-items:center;background:#fff;border-radius:18px;padding:6px 6px 6px 8px}
-.magic input{background:transparent;border:0;font-size:14px;padding:10px 6px}
+.magic input{background:transparent;border:0;font-size:14px;padding:10px 6px;height:44px;min-width:0;text-overflow:ellipsis}
 .magic input:focus{background:transparent}
 .hint{font-size:12px;color:var(--muted);margin:10px 4px 0}
 .hint b{color:var(--text);font-weight:500;cursor:pointer;border-bottom:1px dashed #bbb}
@@ -78,7 +82,7 @@ textarea{min-height:72px;resize:vertical}
 .seg button{flex:1;border:0;background:transparent;padding:9px 14px;border-radius:999px;font-weight:600;cursor:pointer;color:#777;font-size:13px}
 .seg button.on{background:#fff;color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .item{background:var(--soft);border-radius:16px;padding:10px;margin-bottom:8px}
-.item .ir{display:grid;grid-template-columns:1fr 64px 110px 34px;gap:6px;align-items:center}
+.item .ir{display:grid;grid-template-columns:76px 1fr 44px;gap:6px;align-items:center}.item .ir .idesc{grid-column:1/-1}.item .ir .x{height:48px}
 .item input,.item textarea{background:#fff}
 .item textarea{min-height:40px;font-size:12px;margin-top:6px}
 .x{height:40px;border-radius:12px;border:0;background:#fff;cursor:pointer;color:var(--muted)}
@@ -132,7 +136,7 @@ nav.bar svg{width:20px;height:20px}
 .sprev img{width:100%;border-radius:14px;display:block;max-height:46vh;object-fit:contain;background:#ECECEC;margin-bottom:10px}
 .view-wrap .plink{display:none}
 .blogo{max-height:40px;max-width:130px;object-fit:contain;margin-bottom:8px}
-.timeline{list-style:none}
+.timeline{list-style:none}.tls{display:inline-block}.tls::first-letter{text-transform:uppercase}
 .timeline li{display:flex;gap:10px;align-items:center;padding:7px 0;font-size:13px}
 .timeline li::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ink);flex:none}
 .timeline li:first-child::before{background:var(--lime);box-shadow:0 0 0 3px #111}
@@ -158,7 +162,8 @@ nav.bar svg{width:20px;height:20px}
 .view-wrap{max-width:720px;margin:0 auto}
 .client-bar{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:18px 0}
 @media(min-width:760px){.view-wrap .paper{padding:40px}}
-@media(max-width:380px){.item .ir{grid-template-columns:1fr 54px 92px 30px}.big{font-size:38px}.paper .parties,.paper .foot{grid-template-columns:1fr}}
+@media(max-width:420px){.paper .foot{grid-template-columns:1fr}}
+@media(max-width:380px){.big{font-size:38px}.paper .parties,.paper .foot{grid-template-columns:1fr}}
 @media print{nav.bar,.noprint,.top{display:none!important}html,body{background:#fff}#app{padding:0;max-width:none}.paper{border-radius:0;padding:0}}
 </style>
 </head>
@@ -233,11 +238,12 @@ function seed(){
 }
 
 /* ---------- money & derived ---------- */
+const bigMoney=(n,cur)=>esc(money(n,cur)).replace(/^([^\d-]+)/,'<span class="cur">$1</span>');
 const money=(n,cur)=>{try{return new Intl.NumberFormat('en-NG',{style:'currency',currency:cur||S.currency,maximumFractionDigits:0}).format(n||0)}catch(e){return (cur||S.currency)+' '+Math.round(n||0).toLocaleString()}};
 const total=d=>d.items.reduce((a,i)=>a+(+i.qty||0)*(+i.rate||0),0);
 const paid=d=>(d.payments||[]).reduce((a,p)=>a+(+p.amt||0),0);
 const balance=d=>Math.max(0,total(d)-paid(d));
-const client=id=>C.find(c=>c.id===id)||{name:'No client',id:''};
+const client=id=>id==='__sample'?{name:"Kemi's Kitchen",id:'__sample',phone:''}:C.find(c=>c.id===id)||{name:'No client',id:''};
 function state(d){
   if(d.type==='invoice'){
     if(d.status==='paid'||(total(d)>0&&balance(d)===0))return 'paid';
@@ -423,7 +429,7 @@ function home(){
    :`<a class="promo" href="#/new"><div class="grow"><b>Type it, send it, get paid</b><p>Try "bill Kemi's Kitchen ₦160k for 20 designs" and the invoice writes itself.</p></div><div class="coin">${({NGN:'₦',USD:'$',GBP:'£',EUR:'€'})[S.currency]||'₦'}</div></a>`;
   const recentClients=[...C].sort((a,b)=>{const la=Math.max(0,...D.filter(d=>d.clientId===a.id).map(d=>+new Date(d.date)));const lb=Math.max(0,...D.filter(d=>d.clientId===b.id).map(d=>+new Date(d.date)));return lb-la}).slice(0,8);
   return `<div class="top"><div class="logo">Setul</div><div class="tr"><button class="icb" id="how">${ic.help}</button><a class="blackpill" href="#/new">${ic.plus.replace('<svg','<svg width="14" height="14"')} New<span class="ld"></span></a></div></div>
-  <div class="hero"><div class="lab">You're owed <span class="chip"></span></div><div class="big">${money(o)}</div><span class="gpill">${money(thisMonthIn())} came in this month</span></div>
+  <div class="hero"><div class="lab">You're owed</div><div class="big">${bigMoney(o)}</div><span class="gpill">${money(thisMonthIn())} came in this month</span></div>
   <div class="duo"><a href="#/new?type=quote">${ic.up} Quote</a><a href="#/new?type=invoice">${ic.down} Invoice</a></div>
   ${promo}
   ${MODE==='cloud'&&(S.biz==='Your Studio'||!S.acctNo)?`<a class="card" href="#/settings" style="display:flex;align-items:center;gap:12px"><div class="chip" style="width:34px;height:22px;border-radius:5px;flex:none"></div><div style="flex:1"><div style="font-weight:600">Make it yours</div><div class="small muted">Add your business name and bank details so invoices carry them.</div></div>${ic.up}</a>`:''}
@@ -464,7 +470,7 @@ function newdoc(id,q,name){
   const d=draft,editing=name.startsWith('edit');
   return `${topbar(editing?'Edit '+esc(d.num):d.type==='quote'?'New quote':'New invoice')}
   ${editing?'':`<div class="seg" style="margin-bottom:12px"><button data-type="quote" class="${d.type==='quote'?'on':''}">Quote</button><button data-type="invoice" class="${d.type==='invoice'?'on':''}">Invoice</button></div>
-  <div class="magic"><input id="sentence" placeholder="bill Kemi's Kitchen ₦160k for 20 designs" autocomplete="off"><button class="btn lime" id="fill">Fill it</button></div>
+  <div class="magic"><input id="sentence" placeholder="bill Kemi ₦160k for 20 designs" autocomplete="off"><button class="btn lime" id="fill">Fill it</button></div>
   <div class="hint">Try <b data-ex="Quote Northwind Fitness ₦450k for brand identity design, due in 14 days">quote Northwind ₦450k for brand identity</b> or <b data-ex="Invoice Adeyemi & Co $800 for pitch deck design">invoice Adeyemi & Co $800 for a pitch deck</b></div>`}
   <div class="card" style="margin-top:12px">
    <div class="ch" style="margin-bottom:0"><h3>${d.type==='quote'?'Quote for':'Bill to'}</h3></div>
@@ -519,7 +525,7 @@ function paperHTML(d,s,c){
   ${d.type==='invoice'&&state(d)!=='paid'&&(s.acctNo||s.payLink)?`<div class="plink" style="text-align:right;margin-top:14px"><a href="${viewLink(d)}?pay=1" style="display:inline-block;background:${col};color:${onCol(col)};padding:10px 18px;border-radius:999px;font-weight:600;font-size:12px;text-decoration:none">Pay now →</a></div>`:''}
   ${d.type==='quote'&&!['accepted','declined'].includes(d.status)?`<div class="plink" style="text-align:right;margin-top:14px"><a href="${viewLink(d)}" style="display:inline-block;background:${col};color:${onCol(col)};padding:10px 18px;border-radius:999px;font-weight:600;font-size:12px;text-decoration:none">Accept quote →</a></div>`:''}${d.type==='quote'&&d.status==='accepted'&&+d.deposit>0&&!d.depositPaid&&(s.acctNo||s.payLink)?`<div class="plink" style="text-align:right;margin-top:14px"><a href="${viewLink(d)}?pay=1" style="display:inline-block;background:${col};color:${onCol(col)};padding:10px 18px;border-radius:999px;font-weight:600;font-size:12px;text-decoration:none">Pay deposit →</a></div>`:''}
   <div class="words">${numWords(total(d))} ${curWord[d.cur||s.currency]||''} only</div>
-  <div class="foot"><div>${s.acctNo?`<div class="lab2">Pay by bank transfer</div>${esc(s.acctName)}\n${esc(s.acctNo)}\n${esc(s.bank)}`:''}</div><div>${(d.notes||s.terms)?`<div class="lab2">Notes and terms</div>${esc(d.notes||s.terms)}`:''}</div></div>
+  ${(()=>{const parts=[s.acctNo?`<div><div class="lab2">Pay by bank transfer</div>${esc(s.acctName)}\n${esc(s.acctNo)}\n${esc(s.bank)}</div>`:'',(d.notes||s.terms)?`<div><div class="lab2">Notes and terms</div>${esc(d.notes||s.terms)}</div>`:''].filter(Boolean);return parts.length?`<div class="foot"${parts.length===1?' style="grid-template-columns:1fr"':''}>${parts.join('')}</div>`:''})()}
   </div>`;
 }
 function doc(id){
@@ -551,7 +557,7 @@ function doc(id){
   <div class="card noprint"><div class="agrid">${A.join('')}</div></div>
   ${revCard}
   ${paperHTML(d)}
-  <div class="card noprint" style="margin-top:12px"><div class="ch"><h3>What's happened</h3></div><ul class="timeline">${[...d.tl].reverse().map(t=>`<li><span style="text-transform:capitalize;font-weight:500">${esc(t.s)}</span><span class="muted small" style="margin-left:auto">${fmtShort(t.at)}</span></li>`).join('')}</ul></div>`;
+  <div class="card noprint" style="margin-top:12px"><div class="ch"><h3>What's happened</h3></div><ul class="timeline">${[...d.tl].reverse().map(t=>`<li><span class="tls" style="font-weight:500">${esc(t.s)}</span><span class="muted small" style="margin-left:auto">${fmtShort(t.at)}</span></li>`).join('')}</ul></div>`;
 }
 doc._bind=(id,q)=>{
   const d=D.find(x=>x.id===id);if(!d)return;
@@ -587,7 +593,7 @@ function payment(d){
   sheet(`<div class="top" style="margin-bottom:12px"><button class="icb" id="px">${ic.back}</button><div class="ttl">Record payment</div><span style="width:38px"></span></div>
   <div class="card" style="margin-bottom:0"><div class="small muted" style="margin-bottom:10px">Received from</div><div class="person">${avatar(c)}<div class="grow"><div style="font-weight:600">${esc(c.name)}</div><div class="small muted">${esc(d.num)} · balance ${money(balance(d),d.cur)}</div></div><button class="btn sm" id="pfull">Full</button></div></div>
   <div class="keyamt"><span id="kv"></span><span class="caret"></span></div>
-  <div class="card" style="display:flex;align-items:center;gap:12px;margin-bottom:0"><div class="chip" style="width:34px;height:22px;border-radius:5px"></div><div class="grow" style="flex:1"><div style="font-weight:600;font-size:13px">Date received</div></div><input type="date" id="pdate" value="${today()}" style="width:auto;padding:8px 10px"></div>
+  <div class="card" style="display:flex;align-items:center;gap:12px;margin-bottom:0"><div class="chip" style="width:34px;height:22px;border-radius:5px"></div><div class="grow" style="flex:1"><div style="font-weight:600;font-size:13px">Date received</div></div><input type="date" id="pdate" value="${today()}" style="width:auto;height:40px;padding:8px 10px"></div>
   <div class="pad">${keys.map(k=>`<button data-k="${k}">${k==='del'?ic.del.replace('<svg','<svg width="20" height="20"'):k}</button>`).join('')}</div>
   <button class="btn pri block" id="pok">Save payment</button>`,(m,close)=>{
     const show=()=>{m.querySelector('#kv').textContent=money(+val||0,d.cur)};show();
@@ -615,7 +621,7 @@ function clientPage(id){
   const ds=D.filter(d=>d.clientId===id).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   const o=ds.filter(d=>d.type==='invoice'&&!['draft','paid'].includes(state(d))).reduce((a,d)=>a+balance(d),0),inn=ds.reduce((a,d)=>a+paid(d),0);
   return `${topbar(esc(c.name),`<button class="icb" id="editc">${ic.user}</button>`)}
-  <div class="hero">${avatar(c,'avc').replace('class="avc"','class="avc" style="margin:0 auto 10px;width:64px;height:64px;font-size:20px"').replace('style="','style="margin:0 auto 10px;width:64px;height:64px;font-size:20px;')}<div class="lab">Owes you <span class="chip"></span></div><div class="big">${money(o)}</div><span class="gpill">Paid you ${money(inn)} so far</span><div class="small muted" style="margin-top:10px">${esc(payerText(c.id))}</div></div>
+  <div class="hero">${avatar(c,'avc').replace('class="avc"','class="avc" style="margin:0 auto 10px;width:64px;height:64px;font-size:20px"').replace('style="','style="margin:0 auto 10px;width:64px;height:64px;font-size:20px;')}<div class="lab">Owes you</div><div class="big">${bigMoney(o)}</div><span class="gpill">Paid you ${money(inn)} so far</span><div class="small muted" style="margin-top:10px">${esc(payerText(c.id))}</div></div>
   <div class="duo"><a href="#/new?type=quote&client=${c.id}">${ic.up} Quote</a><a href="#/new?type=invoice&client=${c.id}">${ic.down} Invoice</a></div>
   ${c.phone?`<a class="promo" target="_blank" href="${wa('Hi '+c.name+', ',c.phone)}"><div class="grow"><b>Message ${esc(c.name.split(' ')[0])}</b><p>Open a WhatsApp chat with ${esc(c.phone)}</p></div><div class="coin" style="color:#1c7a4c">${ic.wa.replace('<svg','<svg width="26" height="26"')}</div></a>`:''}
   <div class="card"><div class="ch"><h3>History</h3><span class="muted small">${ds.length}</span></div><div class="list">${ds.map(d=>row(d)).join('')||'<div class="empty">Nothing for this client yet.</div>'}</div></div>`;
@@ -630,8 +636,8 @@ function settings(){
   return `<div class="top"><div class="logo" style="font-size:22px">Settings</div></div>${acct}
   <div class="card"><div class="ch"><h3>Your business</h3></div>
    <label style="margin-top:0">Business name</label><input data-s="biz" value="${esc(S.biz)}"><div class="grid2"><div><label>Email</label><input data-s="email" value="${esc(S.email)}"></div><div><label>Phone</label><input data-s="phone" value="${esc(S.phone)}"></div></div>
-   <div class="grid2"><div><label>Logo</label><input type="file" accept="image/*" id="logo">${S.logo?`<div style="margin-top:8px;display:flex;align-items:center;gap:8px"><img src="${S.logo}" style="max-height:34px"><button class="btn sm" id="rmlogo">Remove</button></div>`:''}</div><div><label>Document colour</label><input type="color" data-s="color" value="${S.color}" style="height:48px;padding:4px"></div></div></div>
-  <div class="card"><div class="ch"><h3>Invoice style</h3></div><div class="seg">${[['clean','Clean'],['bold','Bold'],['minimal','Minimal']].map(([k,l])=>`<button data-tpl="${k}" class="${(S.tpl||'clean')===k?'on':''}">${l}</button>`).join('')}</div><div class="minipaper" style="margin-top:12px;border:1px solid var(--line);border-radius:22px">${paperHTML({id:'sample',type:'invoice',num:'INV-012',clientId:'',title:'Brand identity design',items:[{desc:'Logo and brand mark',details:'',qty:1,rate:250000},{desc:'Brand guide',details:'',qty:1,rate:100000}],date:today(),due:addDays(today(),7),status:'sent',payments:[],notes:'',cur:S.currency,revIncluded:S.revIncluded})}</div></div>
+   <div class="grid2"><div><label>Logo</label><label class="btn" style="margin:0;font-size:14px;color:var(--text);width:100%;height:48px">${S.logo?"Change logo":"Upload logo"}<input type="file" accept="image/*" id="logo" hidden></label>${S.logo?`<div style="margin-top:8px;display:flex;align-items:center;gap:8px"><img src="${S.logo}" style="max-height:34px"><button class="btn sm" id="rmlogo">Remove</button></div>`:''}</div><div><label>Document colour</label><input type="color" data-s="color" value="${S.color}" style="height:48px;padding:4px"></div></div></div>
+  <div class="card"><div class="ch"><h3>Invoice style</h3></div><div class="seg">${[['clean','Clean'],['bold','Bold'],['minimal','Minimal']].map(([k,l])=>`<button data-tpl="${k}" class="${(S.tpl||'clean')===k?'on':''}">${l}</button>`).join('')}</div><div class="minipaper" style="margin-top:12px;border:1px solid var(--line);border-radius:22px">${paperHTML({id:'sample',type:'invoice',num:'INV-012',clientId:'__sample',title:'Brand identity design',items:[{desc:'Logo and brand mark',details:'',qty:1,rate:250000},{desc:'Brand guide',details:'',qty:1,rate:100000}],date:today(),due:addDays(today(),7),status:'sent',payments:[],notes:'',cur:S.currency,revIncluded:S.revIncluded})}</div></div>
   <div class="card"><div class="ch"><h3>How you get paid</h3></div>
    <label style="margin-top:0">Currency</label><select data-s="currency">${cur.map(x=>`<option ${x===S.currency?'selected':''}>${x}</option>`).join('')}</select>
    <label>Account name</label><input data-s="acctName" value="${esc(S.acctName)}"><div class="grid2"><div><label>Account number</label><input data-s="acctNo" value="${esc(S.acctNo)}"></div><div><label>Bank</label><input data-s="bank" value="${esc(S.bank)}"></div></div>
@@ -642,7 +648,7 @@ function settings(){
   <div class="card"><div class="ch"><h3>Projects</h3></div><div class="grid2"><div><label style="margin-top:0">Deposit to start (%)</label><input type="number" data-s="depositPct" value="${S.depositPct}"></div><div><label style="margin-top:0">Revisions included</label><input type="number" data-s="revIncluded" value="${S.revIncluded}"></div></div><label>Price per extra revision</label><input type="number" data-s="revRate" value="${S.revRate}"><div class="small muted" style="margin-top:6px">New quotes start with these. You can change them on each one.</div></div>
   <div class="card"><div class="ch"><h3>Reminders</h3></div><label style="margin-top:0">First reminder, days before it's due</label><input type="number" min="0" data-s="remBefore" value="${S.remBefore}"><div class="small muted" style="margin-top:6px">Then one on the due date, one 3 days late, and firmer ones at 7 and 14 days late.</div>
    <label>Tone</label><div class="seg">${[['polite','Polite'],['firm','Firm'],['abeg','Abeg o']].map(([k,l])=>`<button data-tone="${k}" class="${S.tone===k?'on':''}">${l}</button>`).join('')}</div>
-   <div class="small" style="white-space:pre-line;margin-top:12px;background:var(--soft);border-radius:14px;padding:12px;color:#555">${esc(reminder({num:'INV-004',type:'invoice',clientId:'',items:[{qty:1,rate:150000}],payments:[],due:addDays(today(),-3),status:'sent',id:'preview'}))}</div>
+   <div class="small" style="white-space:pre-line;margin-top:12px;background:var(--soft);border-radius:14px;padding:12px;color:#555">${esc(reminder({num:'INV-004',type:'invoice',clientId:'__sample',items:[{qty:1,rate:150000}],payments:[],due:addDays(today(),-3),status:'sent',id:'preview'}))}</div>
    <div class="small muted" style="margin-top:10px">Setul lines each reminder up on the right day, ready to send in one tap. Sending them on their own switches on once Setul has its email sender.</div></div>
   <div class="card"><div class="ch"><h3>Your data</h3></div><p class="muted small">${MODE==='cloud'?'Download a copy of everything whenever you want one.':'Demo data lives on this device only.'}</p>
    <div class="agrid" style="margin-top:12px"><button class="btn" id="exp">Download backup</button><label class="btn" style="margin:0;font-size:13px;color:var(--text)">Restore backup<input type="file" id="imp" accept=".json" hidden></label><button class="btn danger" id="wipe" style="grid-column:span 2">Start fresh</button></div></div>`;
@@ -668,14 +674,14 @@ view._bind=async(token,q)=>{
   let d,s,c,owner=D.some(x=>x.share_token===token||x.id===token);
   if(MODE==='demo'){d=D.find(x=>x.share_token===token||x.id===token);s=S;c=d&&client(d.clientId)}
   else if(sb){try{const r=await sb.rpc('get_shared_doc',{token});if(r.data){d=r.data.doc;s=Object.assign(defaultSettings(),r.data.biz||{});c=r.data.client||{name:''}}}catch(e){}}
-  if(!d){$('#app').innerHTML=`<div class="card empty" style="margin-top:60px">This link doesn't open anything. Ask whoever sent it to share it again.</div>`;return}
+  if(!d){$('#app').innerHTML=`<div style="text-align:center;margin-top:60px"><div class="logo" style="font-size:22px;margin-bottom:14px">Setul</div><div class="card empty">This link doesn't open anything. Ask whoever sent it to share it again.</div></div>`;return}
   d.cur=d.cur||s.currency;
   const fire=async(ev,info)=>{if(MODE==='demo'){const x=D.find(y=>y.id===d.id);if(ev==='viewed'&&x.status==='sent'){x.status='viewed';x.tl.push({s:'viewed',at:today()})}if(ev==='accepted'){x.status='accepted';x.tl.push({s:'accepted by client',at:today()})}if(ev==='client_paid'||ev==='proof'){x.clientPaid=today();x.tl.push({s:ev==='proof'?'proof of payment sent':x.type==='quote'?'client says deposit paid':'client says paid',at:today()});if(ev==='proof')x.proofs=[...(x.proofs||[]),{data:info,at:today()}]}save();return x}
     const r=await sb.rpc('shared_doc_event',{token:d.share_token,ev,info:info||null});if(r.error)throw r.error;return Object.assign(d,r.data)};
   if(d.status==='sent'&&!owner){try{await fire('viewed')}catch(e){}}
   const bcol=s.color&&s.color.toLowerCase()!=='#ffffff'?s.color:'#111111';
   const paint=()=>{const st=state(d);const payAmt=(s.acctNo||s.payLink)?(d.type==='invoice'&&st!=='paid'?balance(d):d.type==='quote'&&d.status==='accepted'&&+d.deposit>0&&!d.depositPaid?depAmt(d):0):0;const ref=d.type==='quote'?d.num+' deposit':d.num;
-   $('#app').innerHTML=`<div class="view-wrap"><div class="noprint" style="text-align:center;margin:6px 0 16px">${s.logo?`<img src="${s.logo}" alt="${esc(s.biz)}" style="max-height:44px;max-width:160px;object-fit:contain;margin-bottom:6px">`:`<div class="logo" style="font-size:18px">${esc(s.biz)}</div>`}<div class="muted small">sent you a ${d.type==='quote'?'quote':'invoice'}</div></div>
+   $('#app').innerHTML=`<div class="view-wrap"><div class="noprint" style="text-align:center;margin:6px 0 16px">${s.logo?`<img src="${s.logo}" alt="${esc(s.biz)}" style="max-height:44px;max-width:160px;object-fit:contain;margin-bottom:6px">`:`<div class="logo" style="font-size:18px">${esc(s.biz)}</div>`}<div class="muted small">sent you ${d.type==='quote'?'a quote':state(d)==='paid'?'a receipt':'an invoice'}</div></div>
    ${paperHTML(d,s,c)}
    <div class="client-bar noprint">${d.type==='quote'&&!['accepted','declined'].includes(d.status)?`<button class="btn pri" id="vacc" style="background:${bcol};border-color:${bcol};color:${onCol(bcol)}">Accept quote</button>`:''}${d.type==='quote'&&d.status==='accepted'?'<span class="badge b-accepted" style="padding:9px 14px">✓ You accepted this quote</span>':''}
    ${payAmt?(d.clientPaid?`<span class="badge b-accepted" style="padding:9px 14px">✓ You marked this as paid</span><button class="btn" id="vpay">Bank details</button>`:`<button class="btn pri" id="vpay" style="padding:15px 26px;font-size:15px;background:${bcol};border-color:${bcol};color:${onCol(bcol)}">${d.type==='quote'?'Pay deposit':'Pay now'} · ${money(payAmt,d.cur)}</button>`):''}${st==='paid'?'<span class="badge b-paid" style="padding:9px 14px">✓ Paid. Thank you!</span>':''}<button class="btn" id="vdl">Save or share</button></div>
