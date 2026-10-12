@@ -29,7 +29,7 @@ button,input{font:inherit;color:inherit}
 .nav .wrap{display:flex;align-items:center;justify-content:space-between;height:66px}
 .logo{font-weight:800;font-size:24px;letter-spacing:-1px;display:flex;align-items:center;gap:8px}
 .logo i{width:10px;height:10px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 2px #111}
-.logo .lmark{width:30px;height:30px;border-radius:9px;display:block}
+.logo .lmark{height:30px;width:auto;display:block}
 .navl{display:flex;align-items:center;gap:22px;font-size:14px;font-weight:500;color:#444}
 .navl .hide{display:none}
 @media(min-width:760px){.navl .hide{display:inline}}
@@ -56,7 +56,7 @@ h1 span{background:linear-gradient(transparent 62%,var(--lime) 62%,var(--lime) 9
 .screen{background:linear-gradient(180deg,#F6F6F6,#E9E9E9);border-radius:37px;padding:16px 12px 18px;height:560px;overflow:hidden;position:relative}
 .notch{width:96px;height:26px;background:#111;border-radius:0 0 16px 16px;margin:-16px auto 10px}
 .ptop{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding:0 2px}
-.ptop .logo{font-size:19px}.ptop .logo i{display:none}.ptop .logo .lmark{width:24px;height:24px}
+.ptop .logo{font-size:19px}.ptop .logo i{display:none}.ptop .logo .lmark{height:22px;width:auto}
 .newb{background:#111;color:#fff;border-radius:999px;font-size:11px;font-weight:600;padding:6px 11px}
 .c{background:#fff;border-radius:20px;padding:14px;margin-bottom:9px}
 .owed{text-align:center}
@@ -195,7 +195,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;
 <body>
 
 <nav class="nav"><div class="wrap">
-  <a href="#" class="logo"><img class="lmark" src="setul-icon.png" alt="Setul">Setul</a>
+  <a href="#" class="logo"><img class="lmark" src="setul-logo.png" alt="Setul"></a>
   <div class="navl"><a class="hide" href="#how">How it works</a><a class="hide" href="#features">Features</a><a class="hide" href="#faq">FAQ</a><a href="#join" class="pill dark sm" data-cta>Join the waitlist</a></div>
 </div></nav>
 
@@ -210,7 +210,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;
   <div class="stage" aria-hidden="true">
     <div class="phone"><div class="screen">
       <div class="notch"></div>
-      <div class="ptop"><div class="logo"><img class="lmark" src="setul-icon.png" alt="Setul">Setul</div><span class="newb">+ New</span></div>
+      <div class="ptop"><div class="logo"><img class="lmark" src="setul-logo.png" alt="Setul"></div><span class="newb">+ New</span></div>
       <div class="c owed"><small>You're owed</small><div class="amt"><span class="cur">₦</span>250,000</div><span class="gp">₦120,000 came in this month</span></div>
       <div class="late"><div style="flex:1"><b>1 client is late</b><p>₦160,000 is overdue. Your reminder is ready.</p></div><div class="coin">₦</div></div>
       <div class="c">
@@ -343,7 +343,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;
   </div>
 </section>
 
-<footer><div class="wrap"><div class="logo" style="font-size:20px"><img class="lmark" src="setul-icon.png" alt="Setul">Setul</div><span>Quotes, invoices, paid. © 2026 Setul</span></div></footer>
+<footer><div class="wrap"><div class="logo" style="font-size:20px"><img class="lmark" src="setul-logo.png" alt="Setul"></div><span>Quotes, invoices, paid. © 2026 Setul</span></div></footer>
 
 <div class="stickycta" id="sticky"><a href="#join" class="pill dark" data-cta>Join the waitlist</a></div>
 
