@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Setul · quotes, invoices, paid</title>
-<meta name="theme-color" content="#F2F2F2">
+<meta name="theme-color" content="#021F0D">
 <link rel="icon" type="image/png" sizes="64x64" href="../setul-favicon.png">
 <link rel="apple-touch-icon" href="../apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#ECECEC;--card:#FFFFFF;--soft:#F3F3F3;--line:#E7E7E7;--text:#111111;--muted:#8B8B8B;--lime:#C9F230;--ink:#111111;--ok:#22A55B;--bad:#E5484D;--warn:#C98A06}
+:root{--bg:#ECECEC;--card:#FFFFFF;--soft:#F3F3F3;--line:#E7E7E7;--text:#021F0D;--muted:#8B8B8B;--lime:#00FB53;--ink:#021F0D;--ok:#22A55B;--bad:#F75F36;--warn:#C98A06}
 *{box-sizing:border-box;margin:0;padding:0}
 html{background:#E9E9E9}body{min-height:100vh;background:linear-gradient(180deg,#F6F6F6 0%,#E9E9E9 600px);}html,body{color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
 a{color:inherit;text-decoration:none}
@@ -62,7 +62,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:11px 16px;border-radius:999px;border:1px solid var(--line);background:#fff;font-weight:600;cursor:pointer;font-size:13px;white-space:nowrap}
 .btn svg{width:15px;height:15px}
 .btn.pri{background:var(--ink);border-color:var(--ink);color:#fff}
-.btn.lime{background:var(--lime);border-color:var(--lime);color:#111}
+.btn.lime{background:var(--lime);border-color:var(--lime);color:#021F0D}
 .btn.sm{padding:7px 12px;font-size:12px}.btn.ghost{background:transparent;border-color:transparent}.btn.danger{color:var(--bad)}
 .btn.block{width:100%;padding:16px;font-size:15px}
 .agrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -93,7 +93,7 @@ textarea{min-height:72px;resize:vertical}
 nav.bar{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:20;display:flex;gap:6px;padding:7px;border-radius:999px;background:var(--ink);box-shadow:0 12px 30px rgba(0,0,0,.25)}
 nav.bar a{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:#9a9a9a}
 nav.bar a.on{color:#fff;box-shadow:inset 0 0 0 1.5px #5a5a5a;background:#222}
-nav.bar a.new{background:var(--lime);color:#111}
+nav.bar a.new{background:var(--lime);color:#021F0D}
 nav.bar svg{width:20px;height:20px}
 .ccard{border-radius:22px;padding:18px;height:178px;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;margin-bottom:10px;cursor:pointer}
 .ccard.lime{background:var(--lime)}.ccard.black{background:var(--ink);color:#fff}.ccard.white{background:#fff}
@@ -101,16 +101,16 @@ nav.bar svg{width:20px;height:20px}
 .ccard.black .wm{opacity:.12}
 .ccard .cn{font-size:13px;font-weight:500}.ccard .ca{font-size:24px;font-weight:700;letter-spacing:-.5px}
 .ccard .cb{display:flex;justify-content:space-between;align-items:center;font-size:12px;position:relative}
-.ccard .tag{background:#fff;color:#111;border-radius:999px;padding:5px 10px;font-weight:600;font-size:11px}
+.ccard .tag{background:#fff;color:#021F0D;border-radius:999px;padding:5px 10px;font-weight:600;font-size:11px}
 .ccard.white .tag{background:var(--soft)}
 .amt-hero{text-align:center;padding:10px 0 20px}
 .amt-hero .big{margin:6px 0}
 .person{display:flex;align-items:center;gap:12px}
 .person .grow{flex:1;min-width:0}
-.paper{background:#fff;color:#141414;border-radius:22px;padding:26px 22px;font-size:13px}
+.paper{background:#fff;color:#021F0D;border-radius:22px;padding:26px 22px;font-size:13px}
 .paper .ph{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:22px}
 .paper .doctype{font-size:26px;font-weight:800;letter-spacing:-1px;line-height:1}
-.paper .meta{font-size:12px;color:#777;text-align:right}.paper .meta b{color:#141414}
+.paper .meta{font-size:12px;color:#777;text-align:right}.paper .meta b{color:#021F0D}
 .paper .parties{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;font-size:12px}
 .paper .lab2{font-size:11px;color:#999;font-weight:600;margin-bottom:4px}
 .paper table{width:100%;border-collapse:collapse;margin-bottom:14px}
@@ -121,28 +121,28 @@ nav.bar svg{width:20px;height:20px}
 .paper .det{color:#777;font-size:11px;white-space:pre-line;margin-top:3px}
 .paper .tot{display:flex;justify-content:flex-end}.paper .tot div{min-width:210px}
 .paper .tot p{display:flex;justify-content:space-between;padding:4px 0}
-.paper .tot .grand{font-size:18px;font-weight:700;border-top:1.5px solid #141414;margin-top:6px;padding-top:8px}
+.paper .tot .grand{font-size:18px;font-weight:700;border-top:1.5px solid #021F0D;margin-top:6px;padding-top:8px}
 .paper .words{font-size:11px;color:#888;margin-top:6px;text-align:right;font-style:italic}
 .paper .foot{margin-top:22px;display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:11px;color:#555;white-space:pre-line}
-.paper .stamp{display:inline-block;background:var(--lime);color:#111;font-weight:800;font-size:13px;padding:4px 12px;border-radius:999px}
+.paper .stamp{display:inline-block;background:var(--lime);color:#021F0D;font-weight:800;font-size:13px;padding:4px 12px;border-radius:999px}
 .paper.tpl-bold .ph{background:var(--brand);margin:-26px -22px 22px;padding:24px 22px;border-radius:22px 22px 0 0}
 .paper.tpl-bold .ph,.paper.tpl-bold .ph .doctype,.paper.tpl-bold .meta,.paper.tpl-bold .meta b{color:var(--on,#fff)!important}
-.paper.tpl-minimal thead tr{background:transparent!important}.paper.tpl-minimal th{color:#999;border-bottom:1.5px solid #141414;border-radius:0!important}
+.paper.tpl-minimal thead tr{background:transparent!important}.paper.tpl-minimal th{color:#999;border-bottom:1.5px solid #021F0D;border-radius:0!important}
 .paper.tpl-minimal .doctype{font-weight:400;letter-spacing:0}.paper.tpl-minimal .tot .grand{border-top-color:var(--brand)}
-.check{display:flex;align-items:center;gap:10px;font-size:13px;margin-top:14px;font-weight:500;color:var(--text)}.check input{width:20px;height:20px;padding:0;accent-color:#111;flex:none}
-.revdots{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.revdots i{width:22px;height:8px;border-radius:99px;background:var(--soft)}.revdots i.u{background:#111}.revdots i.x{background:var(--bad)}
+.check{display:flex;align-items:center;gap:10px;font-size:13px;margin-top:14px;font-weight:500;color:var(--text)}.check input{width:20px;height:20px;padding:0;accent-color:#021F0D;flex:none}
+.revdots{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.revdots i{width:22px;height:8px;border-radius:99px;background:var(--soft)}.revdots i.u{background:#021F0D}.revdots i.x{background:var(--bad)}
 .proofs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.proofs img{width:92px;height:92px;object-fit:cover;border-radius:12px;border:1px solid var(--line)}.proofs a.pdf{display:grid;place-items:center;width:92px;height:92px;border-radius:12px;background:var(--soft);font-size:12px;font-weight:600}
 .minipaper{zoom:.62;pointer-events:none}
 .sopts{display:grid;gap:8px;margin-bottom:12px}
 .sopt{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:14px 16px;cursor:pointer;font:inherit;color:var(--text);text-decoration:none;width:100%}
-.sopt b{font-size:15px}.sopt span{font-size:12px;color:var(--muted)}.sopt.on{border-color:#111}
+.sopt b{font-size:15px}.sopt span{font-size:12px;color:var(--muted)}.sopt.on{border-color:#021F0D}
 .sprev img{width:100%;border-radius:14px;display:block;max-height:46vh;object-fit:contain;background:#ECECEC;margin-bottom:10px}
 .view-wrap .plink{display:none}
 .blogo{max-height:40px;max-width:130px;object-fit:contain;margin-bottom:8px}
 .timeline{list-style:none}.tls{display:inline-block}.tls::first-letter{text-transform:uppercase}
 .timeline li{display:flex;gap:10px;align-items:center;padding:7px 0;font-size:13px}
 .timeline li::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ink);flex:none}
-.timeline li:first-child::before{background:var(--lime);box-shadow:0 0 0 3px #111}
+.timeline li:first-child::before{background:var(--lime);box-shadow:0 0 0 3px #021F0D}
 .toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:999px;font-weight:600;font-size:13px;opacity:0;transition:all .3s;z-index:70;max-width:90vw;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .celebrate{position:fixed;inset:0;display:grid;place-items:center;z-index:60;background:rgba(240,240,240,.85);backdrop-filter:blur(8px);animation:fade .3s}
@@ -186,15 +186,15 @@ const newToken=()=>(window.crypto&&crypto.randomUUID)?crypto.randomUUID():'xxxxx
 const today=()=>new Date().toISOString().slice(0,10);
 const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x.toISOString().slice(0,10)};
 const addMonths=(d,n)=>{const x=new Date(d);const day=x.getUTCDate();x.setUTCMonth(x.getUTCMonth()+n);if(x.getUTCDate()<day)x.setUTCDate(0);return x.toISOString().slice(0,10)};
-const onCol=h=>{const n=parseInt(String(h||'#111111').replace('#','').padEnd(6,'0').slice(0,6),16);const r=n>>16,g=n>>8&255,b=n&255;return (r*299+g*587+b*114)/1000>150?'#111':'#fff'};
+const onCol=h=>{const n=parseInt(String(h||'#021F0D').replace('#','').padEnd(6,'0').slice(0,6),16);const r=n>>16,g=n>>8&255,b=n&255;return (r*299+g*587+b*114)/1000>150?'#021F0D':'#fff'};
 function shrink(file,max,type){max=max||1400;type=type||'image/jpeg';return new Promise((res,rej)=>{if(!file.type.startsWith('image/')){res(file);return}const img=new Image();img.onload=()=>{const k=Math.min(1,max/Math.max(img.width||max,img.height||max));const cv=document.createElement('canvas');cv.width=Math.round((img.width||max)*k);cv.height=Math.round((img.height||max)*k);const cx=cv.getContext('2d');if(type==='image/jpeg'){cx.fillStyle='#fff';cx.fillRect(0,0,cv.width,cv.height)}cx.drawImage(img,0,0,cv.width,cv.height);cv.toBlob(b=>b?res(b):rej(new Error('image')),type,.85)};img.onerror=()=>rej(new Error('image'));img.src=URL.createObjectURL(file)})}
 const blobToData=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(b)});
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const $=s=>document.querySelector(s);
-const defaultSettings=()=>({biz:'Your Studio',email:'',phone:'',logo:'',color:'#111111',currency:'NGN',acctName:'',acctNo:'',bank:'',terms:'50% upfront, balance on delivery.\nPayment due within 7 days of invoice.',tone:'polite',dueDays:7,validDays:14,tpl:'clean',remBefore:3,revIncluded:2,revRate:15000,depositPct:50});
+const defaultSettings=()=>({biz:'Your Studio',email:'',phone:'',logo:'',color:'#021F0D',currency:'NGN',acctName:'',acctNo:'',bank:'',terms:'50% upfront, balance on delivery.\nPayment due within 7 days of invoice.',tone:'polite',dueDays:7,validDays:14,tpl:'clean',remBefore:3,revIncluded:2,revRate:15000,depositPct:50});
 let SYNCED={};let MODE=null,USER=null,S=defaultSettings(),C=[],D=[];
 const deleted={clients:new Set(),docs:new Set()};
-function loadDemo(){S=Object.assign(defaultSettings(),lsGet('settings',{}));if(S.color==='#F05E1C')S.color='#111111';C=lsGet('clients',null);D=lsGet('docs',null);if(!C||!D)seed();D.forEach(d=>{if(!d.share_token)d.share_token=newToken()})}
+function loadDemo(){S=Object.assign(defaultSettings(),lsGet('settings',{}));if(S.color==='#F05E1C')S.color='#021F0D';C=lsGet('clients',null);D=lsGet('docs',null);if(!C||!D)seed();D.forEach(d=>{if(!d.share_token)d.share_token=newToken()})}
 async function loadCloud(){
   const[s1,c1,d1]=await Promise.all([sb.from('settings').select('data').maybeSingle(),sb.from('clients').select('*'),sb.from('docs').select('*')]);
   const e=s1.error||c1.error||d1.error;if(e)throw e;
@@ -312,7 +312,7 @@ async function renderDoc(d,s,c){
   await loadJS(H2C);s=s||S;c=c||client(d.clientId);const link=viewLink(d);
   const wrap=document.createElement('div');
   wrap.style.cssText='position:fixed;left:-10000px;top:0;width:430px;padding:18px;background:#ECECEC;font-family:Inter,system-ui,sans-serif;z-index:-1';
-  wrap.innerHTML=paperHTML(d,s,c).replace(' id="paper"','')+`<div style="text-align:center;font-size:11px;color:#777;margin-top:12px;line-height:1.7">View online: <a href="${link}" style="color:#111;font-weight:600;word-break:break-all;text-decoration:none">${esc(link.replace(/^https?:\/\//,''))}</a><br>Made with <b style="color:#111">Setul</b></div>`;
+  wrap.innerHTML=paperHTML(d,s,c).replace(' id="paper"','')+`<div style="text-align:center;font-size:11px;color:#777;margin-top:12px;line-height:1.7">View online: <a href="${link}" style="color:#021F0D;font-weight:600;word-break:break-all;text-decoration:none">${esc(link.replace(/^https?:\/\//,''))}</a><br>Made with <b style="color:#021F0D">Setul</b></div>`;
   document.body.appendChild(wrap);
   try{if(document.fonts&&document.fonts.ready)await document.fonts.ready;
     await Promise.all([...wrap.querySelectorAll('img')].map(im=>im.complete?0:new Promise(r=>{im.onload=im.onerror=r})));
@@ -378,7 +378,7 @@ function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');cl
 function celebrate(amt){
   const m=document.createElement('div');m.className='celebrate';m.innerHTML=`<div class="box"><div class="tick">✓</div><div class="muted">Money in</div><div class="big">${money(amt)}</div><div class="gpill">${money(thisMonthIn())} this month</div><div style="margin-top:22px"><button class="btn pri">Nice one</button></div></div>`;
   document.body.appendChild(m);m.querySelector('button').onclick=()=>m.remove();m.onclick=e=>{if(e.target===m)m.remove()};
-  const cols=['#C9F230','#111','#ffffff','#9BD000'];for(let i=0;i<60;i++){const c=document.createElement('div');c.className='conf';c.style.left=Math.random()*100+'vw';c.style.background=cols[i%4];c.style.animationDuration=(1.6+Math.random()*1.8)+'s';c.style.animationDelay=Math.random()*.4+'s';document.body.appendChild(c);setTimeout(()=>c.remove(),4000)}
+  const cols=['#00FB53','#021F0D','#ffffff','#9BD000'];for(let i=0;i<60;i++){const c=document.createElement('div');c.className='conf';c.style.left=Math.random()*100+'vw';c.style.background=cols[i%4];c.style.animationDuration=(1.6+Math.random()*1.8)+'s';c.style.animationDelay=Math.random()*.4+'s';document.body.appendChild(c);setTimeout(()=>c.remove(),4000)}
 }
 function sheet(html,bind){const m=document.createElement('div');m.className='modal';m.innerHTML=`<div class="sheet">${html}</div>`;document.body.appendChild(m);m.onclick=e=>{if(e.target===m)m.remove()};bind&&bind(m,()=>m.remove());return m}
 const sv=p=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
@@ -515,7 +515,7 @@ newdoc._bind=(id,q,name)=>{
 
 /* ---------- DOCUMENT ---------- */
 function paperHTML(d,s,c){
-  s=s||S;c=c||client(d.clientId);const st=state(d),col=s.color||'#111111';
+  s=s||S;c=c||client(d.clientId);const st=state(d),col=s.color||'#021F0D';
   return `<div class="paper tpl-${esc(s.tpl||'clean')}" id="paper" style="--brand:${col};--on:${onCol(col)}">
   <div class="ph"><div>${s.logo?`<img class="blogo" src="${s.logo}" alt="">`:`<div style="font-weight:800;font-size:15px;margin-bottom:8px">${esc(s.biz)}</div>`}<div class="doctype" style="color:${col}">${d.type==='quote'?'Quotation':'Invoice'}</div>${d.title?`<div style="margin-top:6px;font-weight:600">${esc(d.title)}</div>`:''}</div>
   <div class="meta"><div><b>${esc(d.num)}</b></div><div>Date <b>${fmtDate(d.date)}</b></div><div>${d.type==='quote'?'Valid until':'Due'} <b>${fmtDate(d.due)}</b></div>${st==='paid'?'<div style="margin-top:10px"><span class="stamp">PAID</span></div>':''}</div></div>
@@ -682,14 +682,14 @@ view._bind=async(token,q)=>{
   const fire=async(ev,info)=>{if(MODE==='demo'){const x=D.find(y=>y.id===d.id);if(ev==='viewed'&&x.status==='sent'){x.status='viewed';x.tl.push({s:'viewed',at:today()})}if(ev==='accepted'){x.status='accepted';x.tl.push({s:'accepted by client',at:today()})}if(ev==='client_paid'||ev==='proof'){x.clientPaid=today();x.tl.push({s:ev==='proof'?'proof of payment sent':x.type==='quote'?'client says deposit paid':'client says paid',at:today()});if(ev==='proof')x.proofs=[...(x.proofs||[]),{data:info,at:today()}]}save();return x}
     const r=await sb.rpc('shared_doc_event',{token:d.share_token,ev,info:info||null});if(r.error)throw r.error;return Object.assign(d,r.data)};
   if(d.status==='sent'&&!owner){try{await fire('viewed')}catch(e){}}
-  const bcol=s.color&&s.color.toLowerCase()!=='#ffffff'?s.color:'#111111';
+  const bcol=s.color&&s.color.toLowerCase()!=='#ffffff'?s.color:'#021F0D';
   const paint=()=>{const st=state(d);const payAmt=(s.acctNo||s.payLink)?(d.type==='invoice'&&st!=='paid'?balance(d):d.type==='quote'&&d.status==='accepted'&&+d.deposit>0&&!d.depositPaid?depAmt(d):0):0;const ref=d.type==='quote'?d.num+' deposit':d.num;
    $('#app').innerHTML=`<div class="view-wrap"><div class="noprint" style="text-align:center;margin:6px 0 16px">${s.logo?`<img src="${s.logo}" alt="${esc(s.biz)}" style="max-height:44px;max-width:160px;object-fit:contain;margin-bottom:6px">`:`<div class="logo" style="font-size:18px">${esc(s.biz)}</div>`}<div class="muted small">sent you ${d.type==='quote'?'a quote':state(d)==='paid'?'a receipt':'an invoice'}</div></div>
    ${paperHTML(d,s,c)}
    <div class="client-bar noprint">${d.type==='quote'&&!['accepted','declined'].includes(d.status)?`<button class="btn pri" id="vacc" style="background:${bcol};border-color:${bcol};color:${onCol(bcol)}">Accept quote</button>`:''}${d.type==='quote'&&d.status==='accepted'?'<span class="badge b-accepted" style="padding:9px 14px">✓ You accepted this quote</span>':''}
    ${payAmt?(d.clientPaid?`<span class="badge b-accepted" style="padding:9px 14px">✓ You marked this as paid</span><button class="btn" id="vpay">Bank details</button>`:`<button class="btn pri" id="vpay" style="padding:15px 26px;font-size:15px;background:${bcol};border-color:${bcol};color:${onCol(bcol)}">${d.type==='quote'?'Pay deposit':'Pay now'} · ${money(payAmt,d.cur)}</button>`):''}${st==='paid'?'<span class="badge b-paid" style="padding:9px 14px">✓ Paid. Thank you!</span>':''}<button class="btn" id="vdl">Save or share</button></div>
    ${owner?'<div class="noprint small muted" style="text-align:center">This is what your client sees.</div>':''}
-   <div class="noprint muted small" style="text-align:center;margin-top:24px">Made with <b style="color:#111">Setul</b></div></div>`;
+   <div class="noprint muted small" style="text-align:center;margin-top:24px">Made with <b style="color:#021F0D">Setul</b></div></div>`;
    const a=$('#vacc');a&&(a.onclick=async()=>{a.disabled=true;try{await fire('accepted');d.status='accepted';paint();toast(+d.deposit>0?'Accepted. You can pay the deposit now.':'Quote accepted. '+s.biz+' can see it now.')}catch(e){a.disabled=false;toast("That didn't go through. Try again.")}});
    const dl=$('#vdl');dl&&(dl.onclick=()=>shareDoc(d,{s,c}));
    const p=$('#vpay');

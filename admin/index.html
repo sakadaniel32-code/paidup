@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#ECECEC;--card:#fff;--soft:#F3F3F3;--line:#E7E7E7;--text:#111;--muted:#8B8B8B;--lime:#C9F230;--ink:#111;--ok:#22A55B;--bad:#E5484D}
+:root{--bg:#ECECEC;--card:#fff;--soft:#F3F3F3;--line:#E7E7E7;--text:#021F0D;--muted:#8B8B8B;--lime:#00FB53;--ink:#021F0D;--ok:#22A55B;--bad:#E5484D}
 *{box-sizing:border-box;margin:0;padding:0}
 html{overflow-x:hidden}
 html,body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
@@ -39,7 +39,7 @@ button{cursor:pointer;border:0;background:none}
 .seg button{height:32px;padding:0 14px;border-radius:999px;font-size:13px;font-weight:600;color:var(--muted)}
 .seg button.on{background:var(--soft);color:var(--ink)}
 .chk{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);background:#fff;border:1px solid var(--line);height:38px;padding:0 14px;border-radius:999px;cursor:pointer;user-select:none}
-.chk input{accent-color:#111}
+.chk input{accent-color:#021F0D}
 .upd{font-size:12px;color:var(--muted);margin-left:auto}
 .grid{display:grid;gap:14px}
 .k5{grid-template-columns:repeat(5,minmax(0,1fr))}
@@ -48,7 +48,7 @@ button{cursor:pointer;border:0;background:none}
 .kpi .v{font-size:34px;font-weight:800;letter-spacing:-.03em;margin:8px 0 6px;line-height:1}
 .kpi .s{font-size:12px;color:var(--muted);line-height:1.4}
 .kpi .s b{color:var(--ink);font-weight:600}
-.pill{display:inline-block;background:var(--lime);color:#111;font-weight:700;font-size:11px;padding:3px 8px;border-radius:999px}
+.pill{display:inline-block;background:var(--lime);color:#021F0D;font-weight:700;font-size:11px;padding:3px 8px;border-radius:999px}
 .pill.grey{background:var(--soft);color:var(--muted)}
 .kpi.hero{background:var(--ink);color:#fff}
 .kpi.hero .l,.kpi.hero .s{color:#a9a9a9}
@@ -189,8 +189,8 @@ function chart(series){
   series.forEach((s,i)=>{const cx=pl+bw*i+bw/2;
     const h1=(H-pt-pb)*s.waitlist/nice,h2=(H-pt-pb)*s.signups/nice;
     g+=`<g><title>${day(s.day)}: ${s.waitlist} joined waitlist, ${s.signups} new accounts</title>
-      <rect x="${cx-gw-0.5}" y="${H-pb-h1}" width="${gw}" height="${Math.max(h1,s.waitlist?2:0)}" rx="2" fill="#C9F230"/>
-      <rect x="${cx+0.5}" y="${H-pb-h2}" width="${gw}" height="${Math.max(h2,s.signups?2:0)}" rx="2" fill="#111"/>
+      <rect x="${cx-gw-0.5}" y="${H-pb-h1}" width="${gw}" height="${Math.max(h1,s.waitlist?2:0)}" rx="2" fill="#00FB53"/>
+      <rect x="${cx+0.5}" y="${H-pb-h2}" width="${gw}" height="${Math.max(h2,s.signups?2:0)}" rx="2" fill="#021F0D"/>
       <rect x="${cx-bw/2}" y="${pt}" width="${bw}" height="${H-pt-pb}" fill="transparent"/></g>`;
     if(i%step===0||i===n-1)g+=`<text x="${cx}" y="${H-6}" text-anchor="middle" font-size="10" fill="#9a9a9a">${day(s.day)}</text>`});
   return `<svg class="chart" viewBox="0 0 ${W} ${H}" >${g}</svg>`;
@@ -243,7 +243,7 @@ function render(){
 
   <div class="grid row2">
     <div class="card">
-      <div class="h"><h3>Growth</h3><div class="sp"></div><div class="leg"><span><i style="background:#C9F230"></i>Joined waitlist</span><span><i style="background:#111"></i>New accounts</span></div></div>
+      <div class="h"><h3>Growth</h3><div class="sp"></div><div class="leg"><span><i style="background:#00FB53"></i>Joined waitlist</span><span><i style="background:#021F0D"></i>New accounts</span></div></div>
       ${d?chart(d.series):'<div class="chart skel"></div>'}
     </div>
     <div class="card funnel">
