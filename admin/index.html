@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>HQ · Control room</title>
+<link rel="icon" type="image/png" sizes="64x64" href="../setul-favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -19,6 +20,7 @@ button{cursor:pointer;border:0;background:none}
 .wrap{max-width:1180px;margin:0 auto;padding:20px 20px 60px}
 .top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}
 .logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:20px;letter-spacing:-.02em}
+.logo>img{width:26px;height:26px;border-radius:8px;display:block}
 .dot{width:14px;height:14px;border-radius:50%;border:3px solid var(--ink);background:var(--lime)}
 .logo small{font-weight:600;font-size:12px;color:var(--muted);letter-spacing:0;margin-left:2px}
 .sp{flex:1}
@@ -155,7 +157,7 @@ setInterval(()=>{if(document.visibilityState==='visible'&&S.user&&!S.loading&&!S
 
 function renderLogin(msg,bad){
   $('#app').innerHTML=`<div class="wrap center"><div class="card login">
-    <div class="logo"><span class="dot"></span>HQ<small>Control room</small></div>
+    <div class="logo"><img src="../setul-icon.png" alt="Setul HQ"><span class="dot"></span>HQ<small>Control room</small></div>
     <h1>Sign in</h1>
     <p>Team only. Enter your email and we'll send you a sign-in link.</p>
     <form id="lf"><input id="em" type="email" required placeholder="you@email.com" autocomplete="email"><button class="btn" id="lb">Send sign-in link</button></form>
@@ -168,7 +170,7 @@ function renderLogin(msg,bad){
 }
 function renderDenied(){
   $('#app').innerHTML=`<div class="wrap center"><div class="card login">
-    <div class="logo"><span class="dot"></span>HQ<small>Control room</small></div>
+    <div class="logo"><img src="../setul-icon.png" alt="Setul HQ"><span class="dot"></span>HQ<small>Control room</small></div>
     <h1>Team only</h1><p>You're signed in as ${esc(S.user?.email)}, but this account isn't on the HQ team.</p>
     <button class="btn ghost" id="so">Sign out</button></div></div>`;
   $('#so').onclick=()=>sb.auth.signOut();
@@ -210,7 +212,7 @@ function render(){
   const rangeTxt=`last ${S.days} days`;
   $('#app').innerHTML=`<div class="wrap">
   <div class="top">
-    <div class="logo"><span class="dot"></span>HQ<small>Control room</small></div>
+    <div class="logo"><img src="../setul-icon.png" alt="Setul HQ"><span class="dot"></span>HQ<small>Control room</small></div>
     <div class="sp"></div>
     <span class="who hide-sm">${S.sample?'Sample mode':esc(S.user?.email)}</span>
     <button class="btn ghost" id="rf" ${S.loading?'disabled':''}>${S.loading?'Refreshing…':'Refresh'}</button>
