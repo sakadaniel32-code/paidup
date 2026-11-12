@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Setul · Join the waitlist</title>
+<meta name="description" content="Quotes, invoices and getting paid. Join the Setul waitlist and hear first when it opens.">
+<link rel="icon" href="setul-favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#021F0D;--green:#00FB53;--muted:#5a6b60;--line:#e7ece8}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,sans-serif;background:#fff;color:var(--ink);min-height:100vh;display:flex;flex-direction:column}
+h1,h2,.g{font-family:'Space Grotesk',sans-serif}
+header{display:flex;justify-content:space-between;align-items:center;padding:22px 24px;max-width:720px;margin:0 auto;width:100%}
+header img{height:26px;width:auto}
+header a{font-family:'Space Grotesk',sans-serif;font-size:14px;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--ink)}
+main{flex:1;display:flex;flex-direction:column;justify-content:center;padding:32px 24px 48px;max-width:520px;margin:0 auto;width:100%}
+.chip{display:inline-block;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:var(--green);color:var(--ink);padding:5px 12px;border-radius:999px;transform:rotate(-2deg);margin-bottom:20px;width:max-content}
+h1{font-size:clamp(30px,6.5vw,44px);line-height:1.08;letter-spacing:-.02em;font-weight:700}
+h1 em{font-style:normal;background:linear-gradient(transparent 62%,var(--green) 62%)}
+.sub{margin:14px 0 30px;color:var(--muted);font-size:16px;line-height:1.6}
+form label{display:block;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;margin:0 0 6px}
+form .row{margin-bottom:16px}
+input{width:100%;padding:13px 14px;font:inherit;font-size:15px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);outline:none;transition:border-color .15s}
+input:focus{border-color:var(--ink)}
+.opt{color:var(--muted);font-weight:400;font-size:12px}
+button{width:100%;padding:15px;font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:600;border:none;border-radius:999px;background:var(--ink);color:#fff;cursor:pointer;margin-top:6px;transition:transform .12s,opacity .15s}
+button:hover{opacity:.88}
+button:active{transform:scale(.985)}
+button:disabled{opacity:.55;cursor:default}
+.err{color:#c0392b;font-size:13px;margin-top:10px;display:none}
+.ok{display:none;text-align:left}
+.ok .big{font-size:clamp(28px,6vw,40px);line-height:1.1;letter-spacing:-.02em;font-weight:700;margin:6px 0 10px}
+.ok p{color:var(--muted);font-size:16px;line-height:1.6;margin-bottom:22px}
+.ok a{display:inline-block;font-family:'Space Grotesk',sans-serif;font-weight:600;text-decoration:none;background:var(--green);color:var(--ink);padding:13px 26px;border-radius:999px}
+footer{padding:20px 24px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;max-width:720px;margin:0 auto;width:100%}
+footer a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--ink)}
+@media(max-width:480px){header,footer{padding-inline:20px}main{padding-inline:20px}}
+</style>
+</head>
+<body>
+<header>
+  <img src="setul-logo.png" alt="Setul">
+  <a href="app/?demo=1">Try the demo</a>
+</header>
+<main>
+  <div id="wlwrap">
+    <span class="chip">Early access</span>
+    <h1>Do the work. <em>Let Setul chase the money.</em></h1>
+    <p class="sub">Send quotes and invoices your client can open, accept and pay from WhatsApp. Join the waitlist and you'll hear first when Setul opens.</p>
+    <form id="wl" novalidate>
+      <div class="row"><label for="n">Your name</label><input id="n" autocomplete="name"></div>
+      <div class="row"><label for="e">Email</label><input id="e" type="email" autocomplete="email"></div>
+      <div class="row"><label for="w">WhatsApp number <span class="opt">(optional)</span></label><input id="w" type="tel" autocomplete="tel"></div>
+      <button id="go" type="submit">Join the waitlist</button>
+      <div class="err" id="err"></div>
+    </form>
+  </div>
+  <div class="ok" id="okw">
+    <h2 class="big">You're on the list.</h2>
+    <p id="donet">While you wait, take Setul for a spin. The demo is loaded with sample clients, so you can try everything.</p>
+    <a href="app/?demo=1">Try the demo &rarr;</a>
+  </div>
+</main>
+<footer>
+  <span>Quotes, invoices, paid. &copy; 2026 Setul</span>
+  <a href="index.html">Full site &rarr;</a>
+</footer>
+<script>
+const SB_URL='https://rsmecdjskwhrqpobivvg.supabase.co',SB_KEY='sb_publishable_FCa5SnOusl-t3-mwai4PZw_9M32lAli';
+const $=s=>document.querySelector(s);
+function showDone(name){$('#wlwrap').style.display='none';$('#okw').style.display='block';if(name)$('#donet').textContent="You're on the list, "+name.split(' ')[0]+". While you wait, take Setul for a spin. The demo is loaded with sample clients, so you can try everything."}
+try{const saved=JSON.parse(localStorage.getItem('setul_waitlist')||'null');if(saved)showDone(saved.name)}catch(e){}
+$('#wl').addEventListener('submit',async ev=>{
+  ev.preventDefault();const err=$('#err'),btn=$('#go');err.style.display='none';
+  const name=$('#n').value.trim(),email=$('#e').value.trim().toLowerCase(),whatsapp=$('#w').value.trim();
+  if(!name){err.textContent='Add your name.';err.style.display='block';$('#n').focus();return}
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){err.textContent="That email doesn't look right.";err.style.display='block';$('#e').focus();return}
+  btn.disabled=true;btn.textContent='Joining…';
+  try{
+    const r=await fetch(SB_URL+'/rest/v1/waitlist',{method:'POST',headers:{apikey:SB_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({name,email,whatsapp:whatsapp||null,source:(document.referrer||'direct').slice(0,200)})});
+    if(r.ok||r.status===409){localStorage.setItem('setul_waitlist',JSON.stringify({name}));showDone(name)}
+    else throw new Error(r.status)
+  }catch(e){err.textContent="That didn't go through. Check your connection and try again.";err.style.display='block'}
+  btn.disabled=false;btn.textContent='Join the waitlist';
+});
+</script>
+</body>
+</html>
